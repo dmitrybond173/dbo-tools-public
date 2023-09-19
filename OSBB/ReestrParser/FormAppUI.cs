@@ -139,6 +139,17 @@ namespace ReestrParser
 
         private void btnParse_Click(object sender, EventArgs e)
         {
+            string path = txtFilespecs.Text.Trim();
+            string fn = Path.GetFileName(path);
+            bool hasSpecs = (fn.Contains("?") || fn.Contains("*"));
+            if (hasSpecs)
+                path = Path.GetDirectoryName(path);
+            else
+                fn = "*.txt";
+
+            this.Settings.SrcFiles.Clear();
+            this.Settings.SrcFiles.Add(new ToolSettings.FileSource(this.Settings, path, fn));
+
             performParse();
         }
     }

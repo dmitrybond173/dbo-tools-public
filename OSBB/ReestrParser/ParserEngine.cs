@@ -76,7 +76,9 @@ namespace ReestrParser
             List<FileInfo> files = new List<FileInfo>();
             foreach (ToolSettings.FileSource fs in this.Settings.SrcFiles)
             {
+                Trace.WriteLine(string.Format("--- Resolving: {0}...", fs));
                 fs.ResolveFiles();
+                Trace.WriteLine(string.Format(" * {0} files to be added...", fs.Files.Count));
                 files.AddRange(fs.Files);
             }
             Trace.WriteLine(string.Format("* {0} files to process...", files.Count));

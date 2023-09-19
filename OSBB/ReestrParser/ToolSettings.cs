@@ -418,6 +418,11 @@ namespace ReestrParser
                     this.Path = Directory.GetCurrentDirectory();
             }
 
+            public override string ToString()
+            {
+                return String.Format("FileSrc[{0}; {1}]", this.Path, this.Filespecs);
+            }
+
             public ToolSettings Owner { get; protected set; }
             public string Path;
             public string Filespecs = DEFAULT_Filespecs;
