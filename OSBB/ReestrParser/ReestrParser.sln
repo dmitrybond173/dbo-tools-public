@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReestrParser", "ReestrParser.csproj", "{5CB1A6EA-31DD-42D2-8E5A-0F31671B4E8F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5CB1A6EA-31DD-42D2-8E5A-0F31671B4E8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CB1A6EA-31DD-42D2-8E5A-0F31671B4E8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CB1A6EA-31DD-42D2-8E5A-0F31671B4E8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CB1A6EA-31DD-42D2-8E5A-0F31671B4E8F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CAF4831F-64AA-4F78-A8A8-8268EEBBD554}
+	EndGlobalSection
+EndGlobal

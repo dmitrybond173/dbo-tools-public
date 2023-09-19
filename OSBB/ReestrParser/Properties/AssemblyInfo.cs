@@ -1,0 +1,37 @@
+﻿using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+
+// General Information about an assembly is controlled through the following 
+// set of attributes. Change these attribute values to modify the information
+// associated with an assembly.
+[assembly: AssemblyTitle("PrivateBank Reestr Parser")]
+[assembly: AssemblyDescription("Parse and convert PrivatBank txt-files with payements registry info db format")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("Dmitry Bond. Inc.")]
+[assembly: AssemblyProduct("con1")]
+[assembly: AssemblyCopyright("Copyright Dmitry Bond. © 2023")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+
+// Setting ComVisible to false makes the types in this assembly not visible 
+// to COM components.  If you need to access a type in this assembly from 
+// COM, set the ComVisible attribute to true on that type.
+[assembly: ComVisible(false)]
+
+// The following GUID is for the ID of the typelib if this project is exposed to COM
+[assembly: Guid("e8412d3c-acef-4a84-aa59-b15ad3c3d95e")]
+
+// Version information for an assembly consists of the following four values:
+//
+//      Major Version
+//      Minor Version 
+//      Build Number
+//      Revision
+//
+// You can specify all the values or you can default the Build and Revision Numbers 
+// by using the '*' as shown below:
+// [assembly: AssemblyVersion("1.0.*")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("2023.09.19.1007")]
+

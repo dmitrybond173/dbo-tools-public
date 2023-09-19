@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="D:/reestr.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="0"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="3016"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><current_table name="4,12:mainReestrHeader"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="ReestrHeader" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="40"/><column index="2" value="62"/><column index="3" value="40"/><column index="4" value="40"/><column index="5" value="62"/><column index="6" value="63"/><column index="7" value="85"/><column index="8" value="60"/><column index="9" value="61"/><column index="10" value="83"/><column index="11" value="84"/><column index="12" value="80"/><column index="13" value="40"/><column index="14" value="55"/><column index="15" value="79"/><column index="16" value="76"/><column index="17" value="113"/><column index="18" value="66"/><column index="19" value="104"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table></browse_table_settings></tab_browse><tab_sql><sql name="SQL 1">    
+    CREATE TABLE &quot;ReestrHeader&quot; (
+      id               INTEGER  not null UNIQUE,
+      filename         TEXT     not null,
+      lang             TEXT     not null,
+      date             TEXT     not null,
+      sndBank          TEXT     not null,
+      sndCode          TEXT     not null,
+      sndAccount       TEXT     not null,
+      rcvBank          TEXT     not null,
+      rcvCode          TEXT     not null,
+      rcvAccount       TEXT     not null,
+      reestrName       TEXT     not null,
+      reestrDate       TEXT     not null,
+      po               TEXT     not null,
+      poDate           TEXT     not null,
+      totalAccNo       TEXT     not null,
+      totalItems       INTEGER  not null,
+      totalCommission  REAL     not null,
+      totalSum         REAL     not null,
+      totalConfirmed   REAL     not null,
+      primary key (id)
+    );
+
+CREATE TABLE &quot;ReestrItem&quot; (
+      reestrId     INTEGER  not null,
+      idx          INTEGER  not null,
+      docNo        TEXT     not null,
+      operDay      TEXT     not null,
+      name         TEXT     not null,
+      account      TEXT     not null,
+      address      TEXT     not null,
+      kvRef        TEXT     not null default '',
+      counters     TEXT     not null,
+      payinterval  TEXT     not null,
+      amount       REAL     not null,
+      commission   REAL     not null,
+      primary key (reestrId, idx)
+    );
+</sql><current_tab id="0"/></tab_sql></sqlb_project>
