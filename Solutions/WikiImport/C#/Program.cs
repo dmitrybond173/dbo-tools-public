@@ -10,8 +10,8 @@ using ImportWiki;
 
 Console.WriteLine("Importing wiki...");
 
-//string fn = "D:/sandbox/github/spectrum-bto-scm-sw/Docs/BtoMediaWiki/BTO+Wiki-sm.xml"; // small piece of wiki
-string fn = "D:/sandbox/github/spectrum-bto-scm-sw/Docs/BtoMediaWiki/BTO+Wiki.xml"; // full wiki export
+//string fn = "C:/sbx/dbo-tools-public/Solutions/WikiImport/My+Wiki-sm.xml"; // small piece of wiki
+string fn = "C:/sbx/dbo-tools-public/Solutions/WikiImport/My+Wiki.xml"; // full wiki export
 WikiFile file = new WikiFile(fn);
 file.Parse();
 
