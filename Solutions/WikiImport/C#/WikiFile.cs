@@ -141,6 +141,7 @@ namespace ImportWiki
             public XmlElement Node { get; protected set; }
             public string Title { get; protected set; }
             public string ID { get; protected set; }
+            public int Index { get; set; }
             public List<PageRevision> Revisions { get; protected set; }
 
             public PageRevision LatestRevision { get { return this.Revisions[this.Revisions.Count - 1]; } }

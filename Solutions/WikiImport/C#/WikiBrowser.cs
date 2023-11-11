@@ -26,11 +26,12 @@ namespace ImportWiki
         public WikiBrowser(string pWikiBaseUrl) 
         {
             this.WikiBaseUrl = pWikiBaseUrl;
-            this.Driver = new ChromeDriver();
+            //this.Driver = new ChromeDriver();
+            this.Driver = new FirefoxDriver();
         }
 
         public string WikiBaseUrl { get; protected set; }
-        public ChromeDriver Driver { get; protected set; }
+        public FirefoxDriver Driver { get; protected set; }
         public string CurrentUrl { get; protected set; }
         public WikiFile.Page CurrentPage { get; protected set; }
 
@@ -54,7 +55,7 @@ namespace ImportWiki
             this.CurrentUrl = resolveUrl(TEMPLATE_PageEditUrl);
             string title = this.CurrentPage.Title;
             //title = CGI.escape(@currentPage.title)
-            Console.WriteLine(string.Format("--- Open WikiEditor[{0}]", this.CurrentUrl));
+            Trace.WriteLine(string.Format("--- #{0}. Open WikiEditor[{1}]", pPage.Index, this.CurrentUrl));
             Driver.Navigate().GoToUrl(this.CurrentUrl);
         }
 
@@ -62,25 +63,29 @@ namespace ImportWiki
         {
             var textArea = Driver.FindElement(By.Name("wpTextbox1"));
             string txt = CurrentPage.LatestRevision.Text;
+
+            // WARNING!
+            // Seems WebDriver cannot set long text into TextArea!
+            // Even when trying to do that with chunks...
             string[] chunks = splitToChunks(txt);
-            Console.WriteLine(string.Format(" * Sending text( {0} chars; {1} chunks )...", txt.Length, chunks.Length));
+            Trace.WriteLine(string.Format(" * Sending text( {0} chars; {1} chunks )...", txt.Length, chunks.Length));
             int idx = 0;
             foreach (string chunk in chunks)
             {
                 idx++;
-                Console.WriteLine(string.Format("   + chunk# {0}", idx));
+                Trace.WriteLine(string.Format("   + chunk# {0}", idx));
                 textArea.SendKeys(chunk);
                 Thread.Sleep(1000);
             }
-            Console.WriteLine(string.Format("   = text sent."));
+            Trace.WriteLine(string.Format("   = text sent."));
 
             var button = Driver.FindElement(By.Name("wpSave"));
             if (button == null)
                 throw new Exception("[Save] button not found on the page!");
 
-            Console.WriteLine(string.Format(" * Saving changes..."));
+            Trace.WriteLine(string.Format(" * Saving changes..."));
             button.Click();
-            Console.WriteLine(string.Format("   = Saved."));
+            Trace.WriteLine(string.Format("   = Saved."));
         }
 
         #region Implementation details
