@@ -1,0 +1,527 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+  WorkersCount - number of parallel workers to parse single log file
+  IOQueueLength - number of I/O parallel workers to flush changes to Local DB. When 0 it will flush directly
+  ParsersPoolChannels - how many log files can be parsed simultaneously
+-->
+<LogFactsExtractorConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                         WorkersCount="4"
+                         IOQueueLength="0"
+                         ParsersPoolChannels="4">
+
+    <!-- Statements to initialize inserter db connection -->
+    <DbInserterInitialization>
+        PRAGMA journal_mode = WAL
+        PRAGMA synchronous = NORMAL
+    </DbInserterInitialization>
+
+    <!-- Statements to initialize reader db connection -->
+    <DbReaderInitialization>
+    </DbReaderInitialization>
+
+    <!-- Statements to initialize generic/common part db (for any of log types) -->
+    <CreateTablesStatement>
+        CREATE TABLE IF NOT EXISTS ParseProject
+        (
+          projectId INT, defaultLogType TEXT(20), location TEXT, comment TEXT, created TEXT(26),
+          PRIMARY KEY (projectId)
+        );
+
+        CREATE TABLE IF NOT EXISTS LogFile
+        (
+          projectId INT, logId INT, logType TEXT(20), filename TEXT, size INT, filetime TEXT(26),
+          created TEXT(26), parsed TEXT(26),
+          parseTime REAL DEFAULT 0, facts INT DEFAULT 0, errors INT DEFAULT 0, exception TEXT,
+          PRIMARY KEY (projectId, logId),
+          FOREIGN KEY(projectId) REFERENCES ParseProject(projectId)
+        );
+    </CreateTablesStatement>
+
+    <!-- Statement to insert log file info -->
+    <LogFileInsertStatement>
+        INSERT INTO LogFile (logId, logType, filename, created) VALUES ( $(logId), $(logType), $(filename), $(created) )
+    </LogFileInsertStatement>
+
+    <!-- Statement to insert log file parsing info -->
+    <LogParseInsertStatement>
+        INSERT INTO LogParse (logId, parseId, filesize, fileCreateTime, fileModifyTime, created, completed)
+        VALUES ( $(logId), $(parseId), $(filesize), $(fileCreateTime), $(fileModifyTime), $(created), $(completed) )
+    </LogParseInsertStatement>
+
+    <!-- 
+      Definitions of Log Types 
+      List of supported LogTimeFormats: currentTs; bymask:...; compactts (AKA yyyymmdd,hhnnss.ff); cslmonLogTimestamp
+    -->
+    <LogTypes>
+
+        <!-- ======= Log Type for parsing CSLMON log files ======= ======= ======= ======= -->
+        <LogTypeConfig Name="CSLMON-ClientsAndSessions" Description="CSLMON clients and sessions"
+                       TableName="CslmonCaS"
+                       LogTimeFormat="cslmonLogTimestamp"
+                       LogFilenamePattern="^(mo|ex)\d{4}\d{2}\d{2}(\-\d{6}(\-(\d+))?)?\.log"
+                       Scope="Directory">
+
+            <!-- Statememts to initialize facts holder table for this log type -->
+            <CreateTableStatement>
+                CREATE TABLE IF NOT EXISTS $(TableName)
+                (
+                  projectId INT, logId INT, lineNo INT, factType TEXT(20), line TEXT, 
+                  logTime TEXT(30), tid TEXT(10), 
+                  clientId TEXT(32), clientEP TEXT(40), execId TEXT(10), action TEXT(40), 
+                  attempt INT, dT INT, seq INT, nValue1 INT,
+                  created TEXT(30),
+
+                  PRIMARY KEY (projectId, logId, lineNo, factType)
+                )
+            </CreateTableStatement>
+
+            <!-- Statememt to insert a fact record -->
+            <FactInsertStatement>
+                INSERT INTO $(TableName) (                
+                  projectId, logId, lineNo, factType, line, logTime, tid, 
+                  clientId, clientEP, execId, action, attempt, dT, seq, nValue1
+                  created
+                )                
+                VALUES ( 
+                  $(projectId), $(logId), $(lineNo), $(factType), $(line), $(logTime), $(tid), 
+                  $(clientId), $(clientEP), $(execId), $(action), $(attempt), $(dT), $(seq), $(nValue1),
+                  $(created)
+                 )
+            </FactInsertStatement>
+
+            <!-- Log line parser definitions - how to extract fact attributes from different kinds of log lines -->
+
+            <Patterns>
+                
+                <ExtractorPattern Name="NewClient" Text="SOCK: new CSL-client#" 
+                    Rexp="(\d{2}\:\d{2}\:\d{2}\.\d{3})\s+\[\d\/T([0-9A-F]+)\]\s+SOCK: new CSL-client#(\d+)\s+connection\s+\(.*\)\s+from\s+(\d+\.\d+\.\d+\.\d+\:\d+)">
+                    <Tosser>
+                        <string>logTime    = #0</string>
+                        <string>tid        = #1</string>
+                        <string>clientId   = #2</string>
+                        <string>clientEP   = #3</string>
+                    </Tosser>
+                </ExtractorPattern>
+
+                <ExtractorPattern Name="CloseClient" Text="Terminated. Connected at" 
+                    Rexp="(\d{2}\:\d{2}\:\d{2}\.\d{3})\s+\[\d\/T([0-9A-F]+)\]\s+CLI:(\d+\.\d+\.\d+\.\d+\:\d+)\s+Terminated\.\s+Connected at \d+\:\d+\:\d+ IO Count (\d+)">
+                    <Tosser>
+                        <string>logTime    = #0</string>
+                        <string>tid        = #1</string>
+                        <string>clientEP   = #2</string>
+                        <string>nValue1    = #3</string>
+                    </Tosser>
+                </ExtractorPattern>
+
+                <ExtractorPattern Name="NewSession" Text="EXE: allocating new session" 
+                    Rexp="(\d{2}\:\d{2}\:\d{2}\.\d{3})\s+\[\d\/T([0-9A-F]+)\]\s+\$.EXE:\s+allocating new session\s+\[.*\]\s+\(\w+\,\s+CLI:(\d+\.\d+\.\d+\.\d+\:\d+)">
+                    <Tosser>
+                        <string>logTime    = #0</string>
+                        <string>tid        = #1</string>
+                        <string>clientEP   = #2</string>
+                    </Tosser>
+                </ExtractorPattern>
+
+                <ExtractorPattern Name="SessionToClient" Text="Allocated session#" 
+                    Rexp="(\d{2}\:\d{2}\:\d{2}\.\d{3})\s+\[\d\/T([0-9A-F]+)\]\s+CLI:(\d+\.\d+\.\d+\.\d+\:\d+)\s+Allocated session#\s+(\d+)\{#\d+/pid=(\d+)/pipe=\d+\}">
+                    <Tosser>
+                        <string>logTime    = #0</string>
+                        <string>tid        = #1</string>
+                        <string>clientEP   = #2</string>
+                        <string>execId     = #3</string>
+                        <string>nValue1    = #4</string>
+                    </Tosser>
+                </ExtractorPattern>
+
+                <ExtractorPattern Name="SessionPipe" Text="Pipe-name: \\.\pipe\" 
+                    Rexp="(\d{2}\:\d{2}\:\d{2}\.\d{3})\s+\[\d\/T([0-9A-F]+)\]\s+\$.EXE:(\d+)\s+Pipe-name\:\s+\\\\\.\\pipe\\">
+                    <Tosser>
+                        <string>logTime    = #0</string>
+                        <string>tid        = #1</string>
+                        <string>execId     = #2</string>
+                    </Tosser>
+                </ExtractorPattern>
+
+                <ExtractorPattern Name="SessionPid" Text="Process Sess(" 
+                    Rexp="(\d{2}\:\d{2}\:\d{2}\.\d{3})\s+\[\d\/T([0-9A-F]+)\]\s+\$.EXE:(\d+)\s+Process Sess\(\d+\)\s+pid\((\d+)\)">
+                    <Tosser>
+                        <string>logTime    = #0</string>
+                        <string>tid        = #1</string>
+                        <string>execId     = #2</string>
+                    </Tosser>
+                </ExtractorPattern>
+
+                <ExtractorPattern Name="PipeConnected" Text="Connect to Pipe" 
+                    Rexp="(\d{2}\:\d{2}\:\d{2}\.\d{3})\s+\[\d\/T([0-9A-F]+)\]\s+\$.EXE:(\d+)\s+Connect to Pipe\s+\\\\\.\\pipe\\_[\d\w]+\s+succeeded \(on attemt# (\d+)\);\s+pipe-handle\(\d+\)\.\s+dT=(\d+) ms">
+                    <Tosser>
+                        <string>logTime    = #0</string>
+                        <string>tid        = #1</string>
+                        <string>execId     = #2</string>
+                        <string>attempt    = #3</string>
+                        <string>dT         = #4</string>
+                    </Tosser>
+                </ExtractorPattern>
+
+                <ExtractorPattern Name="SessionFail" Text="Could not initialize Executor" 
+                    Rexp="(\d{2}\:\d{2}\:\d{2}\.\d{3})\s+\[\d\/T([0-9A-F]+)\]\s+Could not initialize Executor">
+                    <Tosser>
+                        <string>logTime    = #0</string>
+                        <string>tid        = #1</string>
+                    </Tosser>
+                </ExtractorPattern>
+
+                <ExtractorPattern Name="TX" Text="-TX Server" 
+                    Rexp="(\d{2}\:\d{2}\:\d{2}\.\d{3})\s+\[\d\/T([0-9A-F]+)\]\s+CLI:(\d+\.\d+\.\d+\.\d+\:\d+)\s+(BGN|COM|ABT)-TX\s+Server\s+&gt;&lt;\s+Datalen\s+(\d+)\.\s+Request\.Seq#\s+(\d+)">
+                    <Tosser>
+                        <string>logTime    = #0</string>
+                        <string>tid        = #1</string>
+                        <string>clientEP   = #2</string>
+                        <string>action     = #3</string>
+                        <string>seq        = #4</string>
+                    </Tosser>
+                </ExtractorPattern>
+
+                <ExtractorPattern Name="SrvIO" Text="WT-DAT Server" 
+                    Rexp="(\d{2}\:\d{2}\:\d{2}\.\d{3})\s+\[\d\/T([0-9A-F]+)\]\s+CLI:(\d+\.\d+\.\d+\.\d+\:\d+)\s+WT-DAT\s+Server\s+&gt;(\w+)&lt;\s+Datalen\s+(\d+)\.\s+Request\.Seq#\s+(\d+)">
+                    <Tosser>
+                        <string>logTime    = #0</string>
+                        <string>tid        = #1</string>
+                        <string>clientEP   = #2</string>
+                        <string>action     = #3</string>
+                        <string>seq        = #4</string>
+                    </Tosser>
+                </ExtractorPattern>
+
+                <ExtractorPattern Name="SemaEnter" Text="sessions-semaphore entered" 
+                    Rexp="(\d{2}\:\d{2}\:\d{2}\.\d{3})\s+\[\d\/T([0-9A-F]+)\]\s+\$\.EXE:(\d+)\(sync\):\s+sessions-semaphore entered\.\.\.\s+dT=(\d+)\s+ms">
+                    <Tosser>
+                        <string>logTime    = #0</string>
+                        <string>tid        = #1</string>
+                        <string>execId     = #2</string>
+                        <string>dT         = #3</string>
+                    </Tosser>
+                </ExtractorPattern>
+
+            </Patterns>
+        </LogTypeConfig>
+
+        <!-- ======= Log Type for parsing extractions from CSLMON log files ======= ======= ======= ======= -->
+        <LogTypeConfig Name="CSLMON-Sync" Description="Parse synchronization records in CSLMON MO* log file"
+                       TableName="CslmonSync"
+                       LogTimeFormat="byMask:hh:nn:ss.fff"
+                       LogFilenamePattern="^(mo|ex)\d{4}\d{2}\d{2}(\-\d{6}(\-(\d+))?)?\.log"
+                       Scope="File">
+
+            <!-- Statememts to initialize facts holder table for this log type -->
+            <CreateTableStatement>
+                CREATE TABLE IF NOT EXISTS $(TableName) (
+                  projectId INT,
+                  logId INT, lineNo INT, factType TEXT(20),
+                  line TEXT, logTime TEXT(30),
+                  tid TEXT(10), syncId TEXT(30), action TEXT(40), waitTime INT, info TEXT(40),
+                  created TEXT(30),
+                  PRIMARY KEY (projectId, logId, lineNo, factType)
+                )
+            </CreateTableStatement>
+
+            <!-- Statememt to insert a fact record -->
+            <FactInsertStatement>
+                INSERT INTO $(TableName) (projectId, logId, lineNo, factType, line, logTime, tid, syncId, action, waitTime, info, created)
+                VALUES ( $(projectId), $(logId), $(lineNo), $(factType), $(line), $(logTime), $(tid), $(syncId), $(action), $(waitTime), $(info), $(created) )
+            </FactInsertStatement>
+
+            <!-- Log line parser definitions - how to extract fact attributes from different kinds of log lines -->
+            <Patterns>
+                <ExtractorPattern Name="Entering" Text="Entering" Rexp="(\d{2}\:\d{2}\:\d{2}\.\d{3})\s+\[\d+\/(T[0-9,A-F]+)\]\s+\!Sync\[([0-9,A-F]+\:?.*)\][\.\:]Entering(.*)">
+                    <Tosser>
+                        <string>logTime   = #0</string>
+                        <string>tid       = #1</string>
+                        <string>syncId    = #2</string>
+                        <string>action    = Entering</string>
+                        <string>info      = #3</string>
+                    </Tosser>
+                </ExtractorPattern>
+                <ExtractorPattern Name="Entered" Text="Entered" Rexp="(\d{2}\:\d{2}\:\d{2}\.\d{3})\s+\[\d+\/(T[0-9,A-F]+)\]\s+Sync\[([0-9,A-F]+\:?.*)\][\.\:]Entered\s*(\(w=(\d+).*\))">
+                    <Tosser>
+                        <string>logTime   = #0</string>
+                        <string>tid       = #1</string>
+                        <string>syncId    = #2</string>
+                        <string>action    = Entered</string>
+                        <string>info      = #3</string>
+                        <string>waitTime  = #4</string>
+                    </Tosser>
+                </ExtractorPattern>
+                <ExtractorPattern Name="Leaving" Text="Leaving" Rexp="(\d{2}\:\d{2}\:\d{2}\.\d{3})\s+\[\d+\/(T[0-9,A-F]+)\]\s+\!Sync\[([0-9,A-F]+\:?.*)\][\.\:]Leaving(.*)">
+                    <Tosser>
+                        <string>logTime   = #0</string>
+                        <string>tid       = #1</string>
+                        <string>syncId    = #2</string>
+                        <string>action    = Leaving</string>
+                        <string>info      = #3</string>
+                    </Tosser>
+                </ExtractorPattern>
+                <ExtractorPattern Name="Leaved" Text="Leaved" Rexp="(\d{2}\:\d{2}\:\d{2}\.\d{3})\s+\[\d+\/(T[0-9,A-F]+)\]\s+Sync\[([0-9,A-F]+\:?.*)\][\.\:]Leaved(.*)">
+                    <Tosser>
+                        <string>logTime   = #0</string>
+                        <string>tid       = #1</string>
+                        <string>syncId    = #2</string>
+                        <string>action    = Leaved</string>
+                        <string>info      = #3</string>
+                    </Tosser>
+                </ExtractorPattern>
+            </Patterns>
+
+        </LogTypeConfig>
+
+        <!-- ======= Log Type for parsing log files produced by TCP/GW service ======= ======= ======= ======= -->
+        <LogTypeConfig Name="TCP-GW-Service" Description="Log file of TCP-GW"
+                       TableName="TcpGwFact"
+                       LogTimeFormat="yyyymmdd,hhnnss.ff"
+                       LogFilenamePattern="\$BtoGwSrvc\-P\d+\-\d+\.log"
+                       Scope="File">
+
+            <!-- Statememts to initialize facts holder table for this log type -->
+            <CreateTableStatement>
+                CREATE TABLE IF NOT EXISTS $(TableName)
+                (
+                projectId INT, logId INT, lineNo INT, factType TEXT(20),
+                line TEXT, logTime TEXT(30), tid TEXT(10), clientId INT, rep TEXT(30),
+                msg TEXT(200), execTime REAL, replySize INT, btoReply TEXT(30), responseMsg TEXT(200), created TEXT(30),
+                PRIMARY KEY (projectId, logId, lineNo, factType)
+                )
+            </CreateTableStatement>
+
+            <!-- Statememt to insert a fact record -->
+            <FactInsertStatement>
+                INSERT INTO $(TableName) (projectId, logId, lineNo, factType, line, logTime, tid, clientId, rep, msg, execTime, replySize, btoReply, responseMsg, created)
+                VALUES ( $(projectId), $(logId), $(lineNo), $(factType), $(line), $(logTime), $(tid), $(clientId), $(rep), $(msg), $(execTime), $(replySize), $(btoReply), $(responseMsg), $(created) )
+            </FactInsertStatement>
+
+            <!-- Log line parser definitions - how to extract fact attributes from different kinds of log lines -->
+            <Patterns>
+                <ExtractorPattern Name="TcpGwClient" Text="+ New ClientSession( id=" Rexp="(\d{8}\,\d{6}\.\d{2})\s+([\w\d]+)\s+\+\s+New ClientSession\(\s*id=(\d+).*rep=(\d+\.\d+\.\d+\.\d+\:\d+)">
+                    <Tosser>
+                        <string>logTime   = #0</string>
+                        <string>tid       = #1</string>
+                        <string>clientId  = #2</string>
+                        <string>rep       = #3</string>
+                    </Tosser>
+                </ExtractorPattern>
+                <ExtractorPattern Name="TcpGwDispose" Text="].Disposing..." Rexp="(\d{8}\,\d{6}\.\d{2})\s+([\w\d]+)\s+cli#(\d+)\[(\d+\.\d+\.\d+\.\d+\:\d+)\]\.Disposing">
+                    <Tosser>
+                        <string>logTime   = #0</string>
+                        <string>tid       = #1</string>
+                        <string>clientId  = #2</string>
+                        <string>rep       = #3</string>
+                    </Tosser>
+                </ExtractorPattern>
+                <ExtractorPattern Name="TcpGwMsg" Text="-&gt;HandlingMessage(" Rexp="(\d{8}\,\d{6}\.\d{2})\s+([\w\d]+)\s+cli#(\d+)-&amp;gt;HandlingMessage\((.+)\)">
+                    <Tosser>
+                        <string>logTime   = #0</string>
+                        <string>tid       = #1</string>
+                        <string>clientId  = #2</string>
+                        <string>msg       = #3</string>
+                    </Tosser>
+                </ExtractorPattern>
+                <ExtractorPattern Name="TcpGwCslWait" Text="-&gt;Waiting for CSL..." Rexp="(\d{8}\,\d{6}\.\d{2})\s+([\w\d]+)\s+\[sync\]\s+cli#(\d+)-&gt;Waiting for CSL">
+                    <Tosser>
+                        <string>logTime   = #0</string>
+                        <string>tid       = #1</string>
+                        <string>clientId  = #2</string>
+                    </Tosser>
+                </ExtractorPattern>
+                <ExtractorPattern Name="TcpGwCslAccess" Text="-&gt;Got CSL access, dT=" Rexp="(\d{8}\,\d{6}\.\d{2})\s+([\w\d]+)\s+\[sync\]\s+cli#(\d+)-&gt;Got CSL access\, dT=(\d+\.\d+)s">
+                    <Tosser>
+                        <string>logTime   = #0</string>
+                        <string>tid       = #1</string>
+                        <string>clientId  = #2</string>
+                        <string>execTime  = #3</string>
+                    </Tosser>
+                </ExtractorPattern>
+                <ExtractorPattern Name="TcpGwCslReply" Text="-&gt;CSL: Get valid reply within" Rexp="(\d{8}\,\d{6}\.\d{2})\s+([\w\d]+)\s+\&lt;=\s+cli#(\d+)\-&gt;CSL\: Get valid reply within (\d+\.\d+)s\s+\[(\d+)\s+bytes\]=\[\[\s+\[(RC=\d+;\s+Tx=\d+;\s+Msg=\d+)\]\,\s+Data=(.*)\s+\]">
+                    <Tosser>
+                        <string>logTime   = #0</string>
+                        <string>tid       = #1</string>
+                        <string>clientId  = #2</string>
+                        <string>execTime  = #3</string>
+                        <string>replySize = #4</string>
+                        <string>btoReply  = #5</string>
+                        <string>responseMsg = #6</string>
+                    </Tosser>
+                </ExtractorPattern>
+            </Patterns>
+        </LogTypeConfig>
+
+        <!-- ======= Log Type for parsing CSLMON log files ======= ======= ======= ======= -->
+        <LogTypeConfig Name="CSLMON-Logs" Description="Log file of CSLMON"
+                       TableName="CslmonFact"
+                       LogTimeFormat="cslmonLogTimestamp"
+                       LogFilenamePattern="^(mo|ex)\d{4}\d{2}\d{2}(\-\d{6}(\-(\d+))?)?\.log"
+                       Scope="Directory">
+
+            <!-- Statememts to initialize facts holder table for this log type -->
+            <CreateTableStatement>
+                CREATE TABLE IF NOT EXISTS $(TableName)
+                (
+                projectId INT, logId INT, lineNo INT, factType TEXT(20),
+                line TEXT, logTime TEXT(30), appStart TEXT(26), pid INT, tid TEXT(10), sysId TEXT(10),
+                execId TEXT(10), classId TEXT(10), clientId TEXT(32),
+                nValue1 INT, nValue2 INT, txtValue1 TEXT,
+                created TEXT(30),
+                PRIMARY KEY (projectId, logId, lineNo, factType)
+                )
+            </CreateTableStatement>
+
+            <!-- Statememt to insert a fact record -->
+            <FactInsertStatement>
+                INSERT INTO $(TableName) (projectId, logId, lineNo, factType, line, logTime, appStart, pid, tid, sysId, execId, classId, clientId, nValue1, nValue2, txtValue1, created)
+                VALUES ( $(projectId), $(logId), $(lineNo), $(factType), $(line), $(logTime), $(appStart), $(pid), $(tid), $(sysId), $(execId), $(classId), $(clientId),
+                $(nValue1), $(nValue2), $(txtValue1), $(created) )
+            </FactInsertStatement>
+
+            <!-- Log line parser definitions - how to extract fact attributes from different kinds of log lines -->
+            <Patterns>
+                <ExtractorPattern Name="AllocExec" Text=" Allocated." Rexp="(\d{2}\:\d{2}\:\d{2}\.\d{3})\s+\[\d\/T([0-9A-F]+)\]\s+\$\.EXE\:(\d{3})\s+Allocated.">
+                    <Tosser>
+                        <string>logTime   = #0</string>
+                        <string>tid       = #1</string>
+                        <string>execId    = #2</string>
+                    </Tosser>
+                </ExtractorPattern>
+                <ExtractorPattern Name="UnallocExec" Text=" unallocated." Rexp="(\d{2}\:\d{2}\:\d{2}\.\d{3})\s+\[\d\/T([0-9A-F]+)\]\s+\$\.EXE\:(\d{3})\s+unallocated.">
+                    <Tosser>
+                        <string>logTime   = #0</string>
+                        <string>tid       = #1</string>
+                        <string>execId    = #2</string>
+                    </Tosser>
+                </ExtractorPattern>
+                <ExtractorPattern Name="QPsBind" Text=" Allocated session#" Rexp="(\d{2}\:\d{2}\:\d{2}\.\d{3})\s+\[\d\/T([0-9A-F]+)\]\s+(POL[\-\w]?|QUE[\-\w]?)\:([A-Z0-9\-_]+)\s+Allocated session# (\d+)">
+                    <Tosser>
+                        <string>logTime   = #0</string>
+                        <string>tid       = #1</string>
+                        <string>sysId     = #2</string>
+                        <string>clientId  = #3</string>
+                        <string>execId    = #4</string>
+                    </Tosser>
+                </ExtractorPattern>
+                <ExtractorPattern Name="PsDispComplete" Text=" Complete " Rexp="(\d{2}\:\d{2}\:\d{2}\.\d{3})\s+\[\d\/T([0-9A-F]+)\]\s+(POL[\-\w]?|QUE[\-\w]?)\:([A-Z0-9\-_]+)\sDispatcher ([A-Z0-9\-_]+) Complete (\w+)\.">
+                    <Tosser>
+                        <string>logTime   = #0</string>
+                        <string>tid       = #1</string>
+                        <string>sysId     = #2</string>
+                        <string>clientId  = #3</string>
+                        <string>classId   = #4</string>
+                        <string>txtValue1 = #5</string>
+                    </Tosser>
+                </ExtractorPattern>
+                <ExtractorPattern Name="QDispatcherDone" Text=" Releasing session# " Rexp="(\d{2}\:\d{2}\:\d{2}\.\d{3})\s+\[\d\/T([0-9A-F]+)\]\s+(POL[\-\w]?|QUE[\-\w]?)\:([A-Z0-9\-_]+)\sReleasing session# (\d+)">
+                    <Tosser>
+                        <string>logTime   = #0</string>
+                        <string>tid       = #1</string>
+                        <string>sysId     = #2</string>
+                        <string>clientId  = #3</string>
+                        <string>execId    = #4</string>
+                    </Tosser>
+                </ExtractorPattern>
+                <ExtractorPattern Name="ClientBind" Text=" allocated for client" Rexp="(\d{2}\:\d{2}\:\d{2}\.\d{3})\s+\[\d\/T([0-9A-F]+)\]\s+CLI\:(\d+\.\d+\.\d+\.\d+\:(\d+)?)\s+Session# (\d{3}) allocated for client">
+                    <Tosser>
+                        <string>sysId     = CSL</string>
+                        <string>logTime   = #0</string>
+                        <string>tid       = #1</string>
+                        <string>clientId  = #2</string>
+                        <string>execId    = #4</string>
+                    </Tosser>
+                </ExtractorPattern>
+                <ExtractorPattern Name="CslRequest" Text=" ReqHdr Read complete. Bytes Read" Rexp="(\d{2}\:\d{2}\:\d{2}\.\d{3})\s+\[\d\/T([0-9A-F]+)\]\s+CLI\:(\d+\.\d+\.\d+\.\d+\:(\d+)?)\s+ReqHdr Read complete. Bytes Read (\d+)">
+                    <Tosser>
+                        <string>sysId     = CSL</string>
+                        <string>logTime   = #0</string>
+                        <string>tid       = #1</string>
+                        <string>clientId  = #2</string>
+                        <string>nValue1   = #4</string>
+                    </Tosser>
+                </ExtractorPattern>
+                <ExtractorPattern Name="CslTxBegin" Text=" BGN-TX Server " Rexp="(\d{2}\:\d{2}\:\d{2}\.\d{3})\s+\[\d\/T([0-9A-F]+)\]\s+CLI\:(\d+\.\d+\.\d+\.\d+\:(\d+)?)\s+BGN-TX Server \&gt;(\w*)\&lt; Datalen (\d+). Request.Seq# (\d+)">
+                    <Tosser>
+                        <string>sysId     = CSL</string>
+                        <string>logTime   = #0</string>
+                        <string>tid       = #1</string>
+                        <string>clientId  = #2</string>
+                        <string>classId   = #4</string>
+                        <string>nValue1   = #5</string>
+                        <string>nValue2   = #6</string>
+                    </Tosser>
+                </ExtractorPattern>
+                <ExtractorPattern Name="CslTxCommit" Text=" COM-TX Server " Rexp="(\d{2}\:\d{2}\:\d{2}\.\d{3})\s+\[\d\/T([0-9A-F]+)\]\s+CLI\:(\d+\.\d+\.\d+\.\d+\:(\d+)?)\s+COM-TX Server \&gt;(\w*)\&lt; Datalen (\d+). Request.Seq# (\d+)">
+                    <Tosser>
+                        <string>sysId     = CSL</string>
+                        <string>logTime   = #0</string>
+                        <string>tid       = #1</string>
+                        <string>clientId  = #2</string>
+                        <string>classId   = #4</string>
+                        <string>nValue1   = #5</string>
+                        <string>nValue2   = #6</string>
+                    </Tosser>
+                </ExtractorPattern>
+                <ExtractorPattern Name="CslTxAbort" Text=" ABT-TX Server " Rexp="(\d{2}\:\d{2}\:\d{2}\.\d{3})\s+\[\d\/T([0-9A-F]+)\]\s+CLI\:(\d+\.\d+\.\d+\.\d+\:(\d+)?)\s+ABT-TX Server \&gt;(\w*)\&lt; Datalen (\d+). Request.Seq# (\d+)">
+                    <Tosser>
+                        <string>sysId     = CSL</string>
+                        <string>logTime   = #0</string>
+                        <string>tid       = #1</string>
+                        <string>clientId  = #2</string>
+                        <string>classId   = #4</string>
+                        <string>nValue1   = #5</string>
+                        <string>nValue2   = #6</string>
+                    </Tosser>
+                </ExtractorPattern>
+                <ExtractorPattern Name="CslSend" Text=" WT-DAT Server " Rexp="(\d{2}\:\d{2}\:\d{2}\.\d{3})\s+\[\d\/T([0-9A-F]+)\]\s+CLI\:(\d+\.\d+\.\d+\.\d+\:(\d+)?)\s+WT-DAT Server \&gt;(\w*)\&lt; Datalen (\d+). Request.Seq# (\d+)">
+                    <Tosser>
+                        <string>sysId     = CSL</string>
+                        <string>logTime   = #0</string>
+                        <string>tid       = #1</string>
+                        <string>clientId  = #2</string>
+                        <string>classId   = #4</string>
+                        <string>nValue1   = #5</string>
+                        <string>nValue2   = #6</string>
+                    </Tosser>
+                </ExtractorPattern>
+
+                <ExtractorPattern Name="ExecTx" Text="] EXE: " Rexp="(\d{2}\:\d{2}\:\d{2}\.\d{3})\s+\[\d\/?(/T[0-9A-F]+)?\]\s+EXE\:\s+((Begin|Commit|RollBack)\s+WORK)">
+                    <Tosser>
+                        <string>sysId     = Exec</string>
+                        <string>logTime   = #0</string>
+                        <string>classId   = #2</string>
+                    </Tosser>
+                </ExtractorPattern>
+                <ExtractorPattern Name="ExecSrvCall" Text="+++ Calling" Rexp="(\d{2}\:\d{2}\:\d{2}\.\d{3})\s+\[\d\]\s+(\{\d+\})?\s*\+\+\+ Calling \[([A-Za-z0-9\-]+)\]\: ReqDataSize=(\d+); MaxReplySize=(\d+); Request=\{(.+)\}">
+                    <Tosser>
+                        <string>sysId     = Exec</string>
+                        <string>logTime   = #0</string>
+                        <string>classId   = #2</string>
+                        <string>nValue1   = #3</string>
+                        <string>nValue2   = #4</string>
+                        <string>txtValue1 = #5</string>
+                    </Tosser>
+                </ExtractorPattern>
+                <ExtractorPattern Name="ExecSrvCallDone" Text="--- Server" Rexp="(\d{2}\:\d{2}\:\d{2}\.\d{3})\s+\[\d\]\s+(\{\d+\})?\s*\-\-\- Server \[([A-Za-z0-9\-]+)\]\ call completed. ReplyLen=(\d+); Reply=\{(.+)\}">
+                    <Tosser>
+                        <string>sysId     = Exec</string>
+                        <string>logTime   = #0</string>
+                        <string>classId   = #2</string>
+                        <string>nValue1   = #3</string>
+                        <string>txtValue1 = #4</string>
+                    </Tosser>
+                </ExtractorPattern>
+                <ExtractorPattern Name="ExecCrash" Text="Exiting server lib unexpectedly" Rexp="(\d{2}\:\d{2}\:\d{2}\.\d{3})\s+\[\d\]\s+.*Exiting server lib unexpectedly">
+                    <Tosser>
+                        <string>sysId     = Exec</string>
+                        <string>logTime   = #0</string>
+                        <string>classId   = Crash</string>
+                    </Tosser>
+                </ExtractorPattern>
+            </Patterns>
+        </LogTypeConfig>
+
+    </LogTypes>
+
+</LogFactsExtractorConfig>
