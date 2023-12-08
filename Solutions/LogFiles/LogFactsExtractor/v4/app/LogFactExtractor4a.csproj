@@ -28,40 +28,28 @@
     <Compile Include="ParserProject.cs" />
     <Compile Include="Program.cs" />
     
-    <Compile Include="FormMain.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FormMain.Designer.cs">
-      <DependentUpon>FormAppUI.cs</DependentUpon>
-    </Compile>
     <Compile Include="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="FormMain.resx">
-      <DependentUpon>FormMain.cs</DependentUpon>
-    </EmbeddedResource>
 
-    <Compile Include="FormNewProject.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FormNewProject.Designer.cs">
-      <DependentUpon>FormNewProject.cs</DependentUpon>
-    </Compile>
-    <EmbeddedResource Include="FormNewProject.resx">
-      <DependentUpon>FormNewProject.cs</DependentUpon>
-    </EmbeddedResource>
+    <Compile Include="FormMain.cs" />
+    <Compile Include="FormMain.Designer.cs" />
+    <Compile Include="FormNewProject.cs" />
+    <Compile Include="FormNewProject.Designer.cs" />
 
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    
     <Content Include="LogFactsExtractor.cfg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
+
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -72,6 +60,11 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
 
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="FormMain.resx" />
+    <EmbeddedResource Include="FormNewProject.resx" />    
   </ItemGroup>
 
   <ItemGroup>

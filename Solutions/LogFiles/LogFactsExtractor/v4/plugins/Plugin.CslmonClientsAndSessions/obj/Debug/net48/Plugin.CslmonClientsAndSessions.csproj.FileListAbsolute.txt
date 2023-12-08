@@ -1,0 +1,15 @@
+C:\sbx\dbo-tools-public\Solutions\LogFiles\LogFactsExtractor\v4\plugins\Plugin.CslmonClientsAndSessions\obj\Debug\net48\Plugin.CslmonClientsAndSessions.csproj.AssemblyReference.cache
+C:\sbx\dbo-tools-public\Solutions\LogFiles\LogFactsExtractor\v4\plugins\Plugin.CslmonClientsAndSessions\obj\Debug\net48\Plugin.CslmonClientsAndSessions.FormCslmonCaSParams.resources
+C:\sbx\dbo-tools-public\Solutions\LogFiles\LogFactsExtractor\v4\plugins\Plugin.CslmonClientsAndSessions\obj\Debug\net48\Plugin.CslmonClientsAndSessions.csproj.GenerateResource.cache
+C:\sbx\dbo-tools-public\Solutions\LogFiles\LogFactsExtractor\v4\plugins\Plugin.CslmonClientsAndSessions\obj\Debug\net48\Plugin.CslmonClientsAndSessions.GeneratedMSBuildEditorConfig.editorconfig
+C:\sbx\dbo-tools-public\Solutions\LogFiles\LogFactsExtractor\v4\plugins\Plugin.CslmonClientsAndSessions\obj\Debug\net48\Plugin.CslmonClientsAndSessions.csproj.CoreCompileInputs.cache
+C:\sbx\dbo-tools-public\Solutions\LogFiles\LogFactsExtractor\v4\plugins\Plugin.CslmonClientsAndSessions\obj\Debug\net48\Plugin.CslmonClientsAndSessions.sourcelink.json
+C:\sbx\dbo-tools-public\Solutions\LogFiles\LogFactsExtractor\v4\plugins\Plugin.CslmonClientsAndSessions\bin\Debug\net48\Plugin.CslmonClientsAndSessions.dll
+C:\sbx\dbo-tools-public\Solutions\LogFiles\LogFactsExtractor\v4\plugins\Plugin.CslmonClientsAndSessions\bin\Debug\net48\Plugin.CslmonClientsAndSessions.pdb
+C:\sbx\dbo-tools-public\Solutions\LogFiles\LogFactsExtractor\v4\plugins\Plugin.CslmonClientsAndSessions\bin\Debug\net48\System.Configuration.ConfigurationManager.dll
+C:\sbx\dbo-tools-public\Solutions\LogFiles\LogFactsExtractor\v4\plugins\Plugin.CslmonClientsAndSessions\bin\Debug\net48\XService.Net2.dll
+C:\sbx\dbo-tools-public\Solutions\LogFiles\LogFactsExtractor\v4\plugins\Plugin.CslmonClientsAndSessions\bin\Debug\net48\XService.UI.dll
+C:\sbx\dbo-tools-public\Solutions\LogFiles\LogFactsExtractor\v4\plugins\Plugin.CslmonClientsAndSessions\obj\Debug\net48\Plugin.CslmonClientsAndSessions.csproj.CopyComplete
+C:\sbx\dbo-tools-public\Solutions\LogFiles\LogFactsExtractor\v4\plugins\Plugin.CslmonClientsAndSessions\obj\Debug\net48\Plugin.CslmonClientsAndSessions.dll
+C:\sbx\dbo-tools-public\Solutions\LogFiles\LogFactsExtractor\v4\plugins\Plugin.CslmonClientsAndSessions\obj\Debug\net48\Plugin.CslmonClientsAndSessions.pdb
+C:\sbx\dbo-tools-public\Solutions\LogFiles\LogFactsExtractor\v4\plugins\Plugin.CslmonClientsAndSessions\bin\Debug\net48\Plugin.CslmonClientsAndSessions.Templates.xml

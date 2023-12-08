@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.CslmonSyncVisualizat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.TcpGwVisualization", "plugins\Plugin.TcpGwVisualization\Plugin.TcpGwVisualization.csproj", "{2E22CD4A-E8BF-4B54-B113-91F83C2C9B14}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.CslmonClientsAndSessions", "plugins\Plugin.CslmonClientsAndSessions\Plugin.CslmonClientsAndSessions.csproj", "{9697ACDC-5F43-495E-97B9-9A8D54B91B61}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,10 @@ Global
 		{2E22CD4A-E8BF-4B54-B113-91F83C2C9B14}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E22CD4A-E8BF-4B54-B113-91F83C2C9B14}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2E22CD4A-E8BF-4B54-B113-91F83C2C9B14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9697ACDC-5F43-495E-97B9-9A8D54B91B61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9697ACDC-5F43-495E-97B9-9A8D54B91B61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9697ACDC-5F43-495E-97B9-9A8D54B91B61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9697ACDC-5F43-495E-97B9-9A8D54B91B61}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -43,6 +49,7 @@ Global
 		{205F5105-6E27-4CA4-BCDC-8B5733915E7E} = {CA737CBC-E611-4268-A6BF-241D5AD57550}
 		{8E7D26C9-A5C4-4EEF-BFEE-C216B3D8DB9D} = {CA737CBC-E611-4268-A6BF-241D5AD57550}
 		{2E22CD4A-E8BF-4B54-B113-91F83C2C9B14} = {CA737CBC-E611-4268-A6BF-241D5AD57550}
+		{9697ACDC-5F43-495E-97B9-9A8D54B91B61} = {CA737CBC-E611-4268-A6BF-241D5AD57550}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E0BDD757-60AD-422A-9F38-71EE9EDF285D}

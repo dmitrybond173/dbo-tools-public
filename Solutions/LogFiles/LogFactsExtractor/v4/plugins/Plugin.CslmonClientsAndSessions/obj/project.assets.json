@@ -1,0 +1,183 @@
+{
+  "version": 3,
+  "targets": {
+    ".NETFramework,Version=v4.8": {
+      "System.Configuration.ConfigurationManager/8.0.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "System.Configuration"
+        ],
+        "compile": {
+          "lib/net462/System.Configuration.ConfigurationManager.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net462/System.Configuration.ConfigurationManager.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net462/_._": {}
+        }
+      },
+      "XService.Net2/2023.4.23.2029": {
+        "type": "package",
+        "compile": {
+          "lib/net20/XService.Net2.dll": {
+            "related": ".pdb;.XML"
+          }
+        },
+        "runtime": {
+          "lib/net20/XService.Net2.dll": {
+            "related": ".pdb;.XML"
+          }
+        }
+      },
+      "XService.UI/2023.6.15.1629": {
+        "type": "package",
+        "compile": {
+          "lib/net20/XService.UI.dll": {
+            "related": ".pdb;.XML"
+          }
+        },
+        "runtime": {
+          "lib/net20/XService.UI.dll": {
+            "related": ".pdb;.XML"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "System.Configuration.ConfigurationManager/8.0.0": {
+      "sha512": "JlYi9XVvIREURRUlGMr1F6vOFLk7YSY4p1vHo4kX3tQ0AGrjqlRWHDi66ImHhy6qwXBG3BJ6Y1QlYQ+Qz6Xgww==",
+      "type": "package",
+      "path": "system.configuration.configurationmanager/8.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "LICENSE.TXT",
+        "PACKAGE.md",
+        "THIRD-PARTY-NOTICES.TXT",
+        "buildTransitive/net461/System.Configuration.ConfigurationManager.targets",
+        "buildTransitive/net462/_._",
+        "buildTransitive/net6.0/_._",
+        "buildTransitive/netcoreapp2.0/System.Configuration.ConfigurationManager.targets",
+        "lib/net462/System.Configuration.ConfigurationManager.dll",
+        "lib/net462/System.Configuration.ConfigurationManager.xml",
+        "lib/net6.0/System.Configuration.ConfigurationManager.dll",
+        "lib/net6.0/System.Configuration.ConfigurationManager.xml",
+        "lib/net7.0/System.Configuration.ConfigurationManager.dll",
+        "lib/net7.0/System.Configuration.ConfigurationManager.xml",
+        "lib/net8.0/System.Configuration.ConfigurationManager.dll",
+        "lib/net8.0/System.Configuration.ConfigurationManager.xml",
+        "lib/netstandard2.0/System.Configuration.ConfigurationManager.dll",
+        "lib/netstandard2.0/System.Configuration.ConfigurationManager.xml",
+        "system.configuration.configurationmanager.8.0.0.nupkg.sha512",
+        "system.configuration.configurationmanager.nuspec",
+        "useSharedDesignerContext.txt"
+      ]
+    },
+    "XService.Net2/2023.4.23.2029": {
+      "sha512": "wiDGGCQDF9OuuXsDOYDcDwjECWom+UkqIriu3NrYS600F8wMgSfMiRytZKwoD59OLqkdXzkry0nCiplQD63eEA==",
+      "type": "package",
+      "path": "xservice.net2/2023.4.23.2029",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "docs/readme.md",
+        "lib/net20/XService.Net2.XML",
+        "lib/net20/XService.Net2.dll",
+        "lib/net20/XService.Net2.pdb",
+        "xservice.net2.2023.4.23.2029.nupkg.sha512",
+        "xservice.net2.nuspec"
+      ]
+    },
+    "XService.UI/2023.6.15.1629": {
+      "sha512": "qxlttoyz7DBCEVkWr/MII2duvNN7H4+IwkILsVv+Fh9iwuPqdHVcAELebbo+C4nxqoq8+O1HDHv/4doOBFj5vg==",
+      "type": "package",
+      "path": "xservice.ui/2023.6.15.1629",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "docs/readme.md",
+        "lib/net20/XService.UI.XML",
+        "lib/net20/XService.UI.dll",
+        "lib/net20/XService.UI.pdb",
+        "xservice.ui.2023.6.15.1629.nupkg.sha512",
+        "xservice.ui.nuspec"
+      ]
+    }
+  },
+  "projectFileDependencyGroups": {
+    ".NETFramework,Version=v4.8": [
+      "System.Configuration.ConfigurationManager >= 8.0.0",
+      "XService.Net2 >= 2023.4.23.2029",
+      "XService.UI >= 2023.6.15.1629"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\Dmitr\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "C:\\sbx\\dbo-tools-public\\Solutions\\LogFiles\\LogFactsExtractor\\v4\\plugins\\Plugin.CslmonClientsAndSessions\\Plugin.CslmonClientsAndSessions.csproj",
+      "projectName": "Plugin.CslmonClientsAndSessions",
+      "projectPath": "C:\\sbx\\dbo-tools-public\\Solutions\\LogFiles\\LogFactsExtractor\\v4\\plugins\\Plugin.CslmonClientsAndSessions\\Plugin.CslmonClientsAndSessions.csproj",
+      "packagesPath": "C:\\Users\\Dmitr\\.nuget\\packages\\",
+      "outputPath": "C:\\sbx\\dbo-tools-public\\Solutions\\LogFiles\\LogFactsExtractor\\v4\\plugins\\Plugin.CslmonClientsAndSessions\\obj\\",
+      "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
+      "configFilePaths": [
+        "C:\\Users\\Dmitr\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net48"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net48": {
+          "targetAlias": "net48",
+          "projectReferences": {}
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      }
+    },
+    "frameworks": {
+      "net48": {
+        "targetAlias": "net48",
+        "dependencies": {
+          "System.Configuration.ConfigurationManager": {
+            "target": "Package",
+            "version": "[8.0.0, )"
+          },
+          "XService.Net2": {
+            "target": "Package",
+            "version": "[2023.4.23.2029, )"
+          },
+          "XService.UI": {
+            "target": "Package",
+            "version": "[2023.6.15.1629, )"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100\\RuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}
