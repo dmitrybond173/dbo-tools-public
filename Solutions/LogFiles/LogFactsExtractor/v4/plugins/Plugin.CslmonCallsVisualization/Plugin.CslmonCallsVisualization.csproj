@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <DefineConstants>TRACE;_UseDB</DefineConstants>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo> 
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <UseWindowsForms>true</UseWindowsForms>
+    <RootNamespace>Plugin.CslmonCallsVisualization</RootNamespace>
+    <BaseOutputPath>bin</BaseOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="8.0.0" />
+    <PackageReference Include="XService.Net2" Version="2023.4.23.2029" />
+    <PackageReference Include="XService.UI" Version="2023.6.15.1629" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="FormCslmonVisualizationParams.cs" />
+    <Compile Include="FormCslmonVisualizationParams.Designer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Plugin.CslmonCalls.cs" />
+    <Compile Include="Visualizer.CslmonCalls.cs" />
+
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="FormCslmonVisualizationParams.resx" />
+  </ItemGroup>
+
+</Project>

@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34322.80
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogFactExtractor4a", "LogFactExtractor4a.csproj", "{16B79A11-C551-4DFA-8D9F-A0E760BAC2CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogFactExtractor4a", "app\LogFactExtractor4a.csproj", "{16B79A11-C551-4DFA-8D9F-A0E760BAC2CC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.CslmonCallsVisualization", "plugins\Plugin.CslmonCallsVisualization\Plugin.CslmonCallsVisualization.csproj", "{205F5105-6E27-4CA4-BCDC-8B5733915E7E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "plugins", "plugins", "{CA737CBC-E611-4268-A6BF-241D5AD57550}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,9 +19,16 @@ Global
 		{16B79A11-C551-4DFA-8D9F-A0E760BAC2CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{16B79A11-C551-4DFA-8D9F-A0E760BAC2CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{16B79A11-C551-4DFA-8D9F-A0E760BAC2CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{205F5105-6E27-4CA4-BCDC-8B5733915E7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{205F5105-6E27-4CA4-BCDC-8B5733915E7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{205F5105-6E27-4CA4-BCDC-8B5733915E7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{205F5105-6E27-4CA4-BCDC-8B5733915E7E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{205F5105-6E27-4CA4-BCDC-8B5733915E7E} = {CA737CBC-E611-4268-A6BF-241D5AD57550}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E0BDD757-60AD-422A-9F38-71EE9EDF285D}
