@@ -1,0 +1,224 @@
+﻿/*
+ * Log Facts Extractor: visualization plug-in for CSLMON sync logs - UI for visualization parameters.
+ * 
+ * Author: Dmitry Bond (dima_ben@ukr.net)
+ * Date: 2019-08-24
+ */
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using XService.Utils;
+using XService.UI;
+
+namespace Plugin.CslmonSyncVisualization
+{
+    public partial class FormCslmonSyncVisParams : Form
+    {
+        public static bool Execute(Form pOwner, Dictionary<string, object> pParams)
+        {
+            using (FormCslmonSyncVisParams frm = new FormCslmonSyncVisParams())
+            {
+                frm.prms = pParams;
+                frm.display();
+                bool isOk = (frm.ShowDialog() == DialogResult.OK);
+                if (isOk)
+                {
+                    frm.commit();
+                }
+                return isOk;
+            }
+        }
+
+        public FormCslmonSyncVisParams()
+        {
+            InitializeComponent();
+        }
+
+        private Dictionary<string, object> prms;
+        private LogFactsExtractorPlugin plugin = null;
+        private DateTime minTs = DateTime.MinValue;
+        private DateTime maxTs = DateTime.MinValue;
+        private List<string> srvCls;
+        private List<string> selectedSyncNames;
+
+        private void display()
+        { 
+            object obj;
+            if (this.prms.TryGetValue("Plugin", out obj))
+            {
+                this.plugin = (LogFactsExtractorPlugin)obj;
+                string s;
+                if (this.plugin.GetInfo().TryGetValue("VisualizationTypes", out s)) 
+                    populateVisualizationTypes(s);
+            }
+            if (this.prms.TryGetValue("minTs", out obj)) this.minTs = (DateTime)obj;
+            if (this.prms.TryGetValue("maxTs", out obj)) this.maxTs = (DateTime)obj;
+            if (this.prms.TryGetValue("SelectedSyncNames", out obj)) this.selectedSyncNames = (List<string>)obj;
+            if (this.prms.TryGetValue("SyncNames", out obj))
+            {
+                this.srvCls = (List<string>)obj;
+                populateSyncNames();
+            }
+            lvSyncNames.Enabled = (this.srvCls != null && this.srvCls.Count > 0);
+
+            PluginUtils.NskTsToUi(StrUtils.NskTimestampOf(this.minTs), dtpMinTsDt, dtpMinTsTm);
+            PluginUtils.NskTsToUi(StrUtils.NskTimestampOf(this.maxTs), dtpMaxTsDt, dtpMaxTsTm);
+
+            UiTools.RenderInto(txtLegend,
+                "<root>" +
+                "By X-axis - Names of critical sections inside CSLMON, 1 column = 1 critical section<br/>" +
+                "By Y-axis - time, 1 pixel = 1 second<br/>" +
+                "<br/>" +
+                "<b color='silver'>SILVER</b> - <br/>" +
+                "<b color='green'>GREEN</b> - <br/>" +
+                "<b color='red'>RED</b> - <br/>" +
+                "<b color='red'>RED</b> - <br/>" +
+                "</root>"
+                );
+        }
+
+        private void commit()
+        {
+            string ts = PluginUtils.UiToNskTs(dtpMinTsDt, dtpMinTsTm);
+            this.prms["minTs"] = StrUtils.NskTimestampToDateTime(ts);
+            
+            ts = PluginUtils.UiToNskTs(dtpMaxTsDt, dtpMaxTsTm);
+            this.prms["maxTs"] = StrUtils.NskTimestampToDateTime(ts);
+
+            this.prms["VisualizationType"] = cmbVisualType.Items[cmbVisualType.SelectedIndex].ToString();
+
+            if (lvSyncNames.Enabled && lvSyncNames.Items.Count > 0 && this.selectedSyncNames != null)
+            {
+                this.selectedSyncNames.Clear();
+                foreach (ListViewItem li in lvSyncNames.Items)
+                    if (li.Checked)
+                        this.selectedSyncNames.Add(li.Tag.ToString().ToLower());
+            }
+        }
+
+        private void populateVisualizationTypes(string pTypes)
+        {
+            int iSel = -1;
+            cmbVisualType.BeginUpdate();
+            try
+            {
+                cmbVisualType.Items.Clear();
+                if (string.IsNullOrEmpty(pTypes)) 
+                {
+                    cmbVisualType.Enabled = false;
+                    return ;
+                }
+
+                object obj;
+                string selectedType = null;
+                if (this.prms.TryGetValue("VisualizationType", out obj)) 
+                    selectedType = obj.ToString();
+
+
+                string[] types = pTypes.Split(',');
+                foreach (string t in types)
+                {
+                    cmbVisualType.Items.Add(t);
+                    if (selectedType.CompareTo(t) == 0)
+                        iSel = cmbVisualType.Items.Count - 1;
+                }
+            }
+            finally 
+            { 
+                cmbVisualType.EndUpdate();
+                if (iSel >= 0)
+                    cmbVisualType.SelectedIndex = iSel;
+                else if (cmbVisualType.Items.Count > 0)
+                    cmbVisualType.SelectedIndex = 0;
+            }
+        }
+
+        private void populateSyncNames()
+        {
+            lvSyncNames.BeginUpdate();
+            try
+            {
+                lvSyncNames.Items.Clear();
+                if (this.srvCls == null) return;
+
+                foreach (string srv in this.srvCls)
+                {
+                    lvSyncNames.Items.Add(new ListViewItem(srv) { Tag = srv } );
+                }
+            }
+            finally { lvSyncNames.EndUpdate(); }
+        }
+
+        private bool validate()
+        {
+            DateTime ts1 = StrUtils.NskTimestampToDateTime(PluginUtils.UiToNskTs(dtpMinTsDt, dtpMinTsTm));
+            DateTime ts2 = StrUtils.NskTimestampToDateTime(PluginUtils.UiToNskTs(dtpMaxTsDt, dtpMaxTsTm));
+            string errMsg = "";
+            if (this.minTs > ts1)
+            {
+                errMsg += (Environment.NewLine + "Min time cannot be less than olest LogTime value in log file!");
+                PluginUtils.NskTsToUi(StrUtils.NskTimestampOf(this.minTs), dtpMinTsDt, dtpMinTsTm);
+            }
+            if (this.maxTs < ts2)
+            {
+                errMsg += (Environment.NewLine + "Max time cannot be higher than newest LogTime value in log file!");
+                PluginUtils.NskTsToUi(StrUtils.NskTimestampOf(this.maxTs), dtpMaxTsDt, dtpMaxTsTm);
+            }
+            bool isOk = string.IsNullOrEmpty(errMsg);
+            if (!isOk)
+            {
+                MessageBox.Show("Validation problems:" + errMsg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            return isOk;
+        }
+
+        private enum ESelectAction { SelectAll, UnselectAll, Invert }
+
+        private void applySelection(ESelectAction pAction)
+        {
+            foreach (ListViewItem li in lvSyncNames.Items)
+            {
+                switch (pAction)
+                {
+                    case ESelectAction.SelectAll: li.Checked = true; break;
+                    case ESelectAction.UnselectAll: li.Checked = false; break;
+                    case ESelectAction.Invert: li.Checked = !li.Checked; break;
+                }
+            }
+        }
+
+        private void FormCslmonVisualizationParams_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == '\x1B')
+                this.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+        }
+
+        private void btnOk_Click(object sender, EventArgs e)
+        {
+            if (!validate()) return;
+            this.DialogResult = System.Windows.Forms.DialogResult.OK;
+        }
+
+        private void cmiSelectAll_Click(object sender, EventArgs e)
+        {
+            applySelection(ESelectAction.SelectAll);
+        }
+
+        private void cmiUnselectAll_Click(object sender, EventArgs e)
+        {
+            applySelection(ESelectAction.UnselectAll);
+        }
+
+        private void cmiInvertSelection_Click(object sender, EventArgs e)
+        {
+            applySelection(ESelectAction.Invert);
+        }
+    }
+}

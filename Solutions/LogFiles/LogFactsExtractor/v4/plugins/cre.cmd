@@ -1,4 +1,5 @@
-set name=Plugin.CslmonCallsVisualization
+::set name=Plugin.CslmonCallsVisualization
+set name=Plugin.TcpGwVisualization
 dotnet new classlib --name %name% --target-framework-override net48
 
 pushd %name%

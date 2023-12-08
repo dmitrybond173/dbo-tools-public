@@ -76,6 +76,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\plugins\Plugin.CslmonCallsVisualization\Plugin.CslmonCallsVisualization.csproj" />
+    <ProjectReference Include="..\plugins\Plugin.CslmonSyncVisualization\Plugin.CslmonSyncVisualization.csproj" />
+    <ProjectReference Include="..\plugins\Plugin.TcpGwVisualization\Plugin.TcpGwVisualization.csproj" />
   </ItemGroup>
 
 </Project>
