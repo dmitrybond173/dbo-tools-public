@@ -6,7 +6,15 @@ and save them in a local SQLite database file.
 
 So, later you can use that SQLite db file to perform different kinds of analysis, build visualizations, etc.
 
+# TO-DO
+
+- need to git rid of old way of parallel processing and use TPL (System.Threading.Tasks)
+- need to adjust db writing to use Producer+Consumer Async pattern 
+
 # Some info
+
+Log files location = D:\projects\c\cslmon-srvc\make2\logs\files\
+Log file to analyze = mo20231207-short-b.log
 
 D:\JIRA\BTO-658-TcpGw-slow\4mc\
 D:\JIRA\BTO-658-TcpGw-slow\logs\

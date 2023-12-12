@@ -10,6 +10,11 @@ rmdir /s /q bin
 rmdir /s /q obj
 popd
 
+pushd plugins\Plugin.CslmonClientsAndSessions
+rmdir /s /q bin
+rmdir /s /q obj
+popd
+
 pushd plugins\Plugin.CslmonSyncVisualization
 rmdir /s /q bin
 rmdir /s /q obj

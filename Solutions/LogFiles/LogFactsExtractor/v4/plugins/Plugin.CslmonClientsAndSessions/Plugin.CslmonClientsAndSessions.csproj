@@ -19,8 +19,11 @@
   <ItemGroup>
     <Compile Include="FormCslmonCaSParams.cs" />
     <Compile Include="FormCslmonCaSParams.Designer.cs" />
+    <Compile Include="Models.cs" />
+    <Compile Include="PluginUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Plugin.CslmonClientsAndSessions.cs" />
+    <Compile Include="ScriptGenerator.cs" />
     <Compile Include="Visualizer.CslmonClientsAndSessions.cs" />
 
     <Content Include="Plugin.CslmonClientsAndSessions.Templates.xml">

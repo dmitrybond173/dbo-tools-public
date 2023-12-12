@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Registry savedAt="2019-08-29:14:52:00.00000" application="LogFactsExtractor">
-  <Key name="default">
-    <Item name="default" type="string">@</Item>
-  </Key>
-  <Key name="SVG">
-  </Key>
-</Registry>

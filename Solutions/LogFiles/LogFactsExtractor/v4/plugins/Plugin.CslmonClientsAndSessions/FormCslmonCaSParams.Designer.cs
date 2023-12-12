@@ -42,6 +42,7 @@
             this.lvSrvClsHighlight = new System.Windows.Forms.ListView();
             this.labVisualType = new System.Windows.Forms.Label();
             this.cmbVisualType = new System.Windows.Forms.ComboBox();
+            this.chkSortByInitTime = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // dtpMinTsTm
@@ -126,10 +127,10 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtLegend.BackColor = System.Drawing.SystemColors.Info;
             this.txtLegend.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtLegend.Location = new System.Drawing.Point(10, 265);
+            this.txtLegend.Location = new System.Drawing.Point(10, 257);
             this.txtLegend.Name = "txtLegend";
             this.txtLegend.ReadOnly = true;
-            this.txtLegend.Size = new System.Drawing.Size(344, 113);
+            this.txtLegend.Size = new System.Drawing.Size(344, 126);
             this.txtLegend.TabIndex = 11;
             this.txtLegend.TabStop = false;
             this.txtLegend.Text = "";
@@ -139,7 +140,7 @@
             this.labLegend.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.labLegend.AutoSize = true;
-            this.labLegend.Location = new System.Drawing.Point(10, 249);
+            this.labLegend.Location = new System.Drawing.Point(10, 241);
             this.labLegend.Name = "labLegend";
             this.labLegend.Size = new System.Drawing.Size(46, 13);
             this.labLegend.TabIndex = 10;
@@ -163,7 +164,7 @@
             this.lvSrvClsHighlight.HideSelection = false;
             this.lvSrvClsHighlight.Location = new System.Drawing.Point(12, 110);
             this.lvSrvClsHighlight.Name = "lvSrvClsHighlight";
-            this.lvSrvClsHighlight.Size = new System.Drawing.Size(343, 136);
+            this.lvSrvClsHighlight.Size = new System.Drawing.Size(343, 126);
             this.lvSrvClsHighlight.TabIndex = 9;
             this.lvSrvClsHighlight.UseCompatibleStateImageBehavior = false;
             this.lvSrvClsHighlight.View = System.Windows.Forms.View.List;
@@ -188,11 +189,22 @@
             this.cmbVisualType.Size = new System.Drawing.Size(133, 21);
             this.cmbVisualType.TabIndex = 4;
             // 
+            // chkSortByInitTime
+            // 
+            this.chkSortByInitTime.AutoSize = true;
+            this.chkSortByInitTime.Location = new System.Drawing.Point(221, 65);
+            this.chkSortByInitTime.Name = "chkSortByInitTime";
+            this.chkSortByInitTime.Size = new System.Drawing.Size(99, 17);
+            this.chkSortByInitTime.TabIndex = 13;
+            this.chkSortByInitTime.Text = "Sort by InitTime";
+            this.chkSortByInitTime.UseVisualStyleBackColor = true;
+            // 
             // FormCslmonVisualizationParams
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(364, 420);
+            this.Controls.Add(this.chkSortByInitTime);
             this.Controls.Add(this.cmbVisualType);
             this.Controls.Add(this.lvSrvClsHighlight);
             this.Controls.Add(this.txtLegend);
@@ -236,5 +248,6 @@
         private System.Windows.Forms.ListView lvSrvClsHighlight;
         private System.Windows.Forms.Label labVisualType;
         private System.Windows.Forms.ComboBox cmbVisualType;
+        private System.Windows.Forms.CheckBox chkSortByInitTime;
     }
 }

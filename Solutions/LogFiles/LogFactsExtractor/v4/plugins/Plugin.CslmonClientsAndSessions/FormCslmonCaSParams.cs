@@ -1,8 +1,11 @@
 ﻿/*
- * Log Facts Extractor: visualization plug-in for TCP-GW logs - UI for visualization parameters.
+ * Log Facts Extractor: visualization plug-in for CSLMON logs - UI for visualization parameters.
+ * 
+ * WARNING!
+ * In current version this UI is ignored. You can simply click [OK] button...
  * 
  * Author: Dmitry Bond (dima_ben@ukr.net)
- * Date: 2019-08-24
+ * Date: 2023-12-06
  */
 
 using System;
@@ -45,8 +48,6 @@ namespace Plugin.CslmonClientsAndSessions
         private LogFactsExtractorPlugin plugin = null;
         private DateTime minTs = DateTime.MinValue;
         private DateTime maxTs = DateTime.MinValue;
-        private List<string> srvCls;
-        private List<string> selectedSrvCls;
 
         private void display()
         { 
@@ -60,26 +61,23 @@ namespace Plugin.CslmonClientsAndSessions
             }
             if (this.prms.TryGetValue("minTs", out obj)) this.minTs = (DateTime)obj;
             if (this.prms.TryGetValue("maxTs", out obj)) this.maxTs = (DateTime)obj;
-            if (this.prms.TryGetValue("SelectedServerClasses", out obj)) this.selectedSrvCls = (List<string>)obj;
-            if (this.prms.TryGetValue("ServerClasses", out obj))
-            {
-                this.srvCls = (List<string>)obj;
-                populateSrvClasses();
-            }
-            lvSrvClsHighlight.Enabled = (this.srvCls != null && this.srvCls.Count > 0);
 
             PluginUtils.NskTsToUi(StrUtils.NskTimestampOf(this.minTs), dtpMinTsDt, dtpMinTsTm);
             PluginUtils.NskTsToUi(StrUtils.NskTimestampOf(this.maxTs), dtpMaxTsDt, dtpMaxTsTm);
 
+            if (this.prms.TryGetValue("sortByInitTime", out obj)) chkSortByInitTime.Checked = (bool)obj;
+
             UiTools.RenderInto(txtLegend,
                 "<root>" +
-                "By X-axis - CSLMON executors (or CSLMON service itself), 1 column (5 pixels) = 1 executor <br/>" +
-                "By Y-axis - time, 1 pixel = 1 second<br/>" +
+                "On drawing it shows:<br/>" +
+                "* CSL clients (by thin lines)<br/>" +
+                "* Executor sessions (by thick lines on a thin line of CSL client)<br/>" +
                 "<br/>" +
-                "<b color='silver'>SILVER</b> - life-time of executor<br/>" +
-                "<b color='green'>GREEN</b> - scope of commited transaction<br/>" +
-                "<b color='red'>RED</b> - scope of aborted transactio, red line at end n<br/>" +
-                "<b color='red'>RED</b> - scope of aborted transactio, red line at end n<br/>" +
+                "Thick lines of different colors on Executor session line:<br/>" +
+                "<b color='navy'>NAVY</b> - CSL client line<br/>" +
+                "<b color='teal'>TEAL</b> - executor session allocated to CSL client<br/>" +
+                "<b color='silver'>SILVER</b> - wait-time for executor session allocation<br/>" +
+                "<b color='magenta'>MAGENTA</b> - initialization time of this concrete executor<br/>" +
                 "</root>"
                 );
         }
@@ -92,14 +90,9 @@ namespace Plugin.CslmonClientsAndSessions
             ts = PluginUtils.UiToNskTs(dtpMaxTsDt, dtpMaxTsTm);
             this.prms["maxTs"] = StrUtils.NskTimestampToDateTime(ts);
 
-            this.prms["VisualizationType"] = cmbVisualType.Items[cmbVisualType.SelectedIndex].ToString();
+            this.prms["sortByInitTime"] = chkSortByInitTime.Checked;
 
-            if (lvSrvClsHighlight.Enabled && lvSrvClsHighlight.Items.Count > 0 && this.selectedSrvCls != null)
-            {
-                foreach (ListViewItem li in lvSrvClsHighlight.Items)
-                    if (li.Checked)
-                        this.selectedSrvCls.Add(li.Tag.ToString().ToLower());
-            }
+            this.prms["VisualizationType"] = cmbVisualType.Items[cmbVisualType.SelectedIndex].ToString();
         }
 
         private void populateVisualizationTypes(string pTypes)
@@ -139,22 +132,6 @@ namespace Plugin.CslmonClientsAndSessions
             }
         }
 
-        private void populateSrvClasses()
-        {
-            lvSrvClsHighlight.BeginUpdate();
-            try
-            {
-                lvSrvClsHighlight.Items.Clear();
-                if (this.srvCls == null) return;
-
-                foreach (string srv in this.srvCls)
-                {
-                    lvSrvClsHighlight.Items.Add(new ListViewItem(srv) { Tag = srv } );
-                }
-            }
-            finally { lvSrvClsHighlight.EndUpdate(); }
-        }
-
         private bool validate()
         {
             DateTime ts1 = StrUtils.NskTimestampToDateTime(PluginUtils.UiToNskTs(dtpMinTsDt, dtpMinTsTm));
@@ -178,6 +155,8 @@ namespace Plugin.CslmonClientsAndSessions
             return isOk;
         }
 
+        #region Form Event Handlers
+
         private void btnOk_Click(object sender, EventArgs e)
         {
             if (!validate()) return;
@@ -189,5 +168,7 @@ namespace Plugin.CslmonClientsAndSessions
             if (e.KeyChar == '\x1B')
                 this.DialogResult = System.Windows.Forms.DialogResult.Cancel;
         }
+
+        #endregion // Form Event Handlers
     }
 }

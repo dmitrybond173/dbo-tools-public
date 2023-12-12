@@ -1,0 +1,386 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20001102//EN" "http://www.w3.org/TR/2000/CR-SVG-20001102/DTD/svg-20001102.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" 
+  xmlns:xlink="http://www.w3.org/1999/xlink" 
+  id="CSLMON-ClientsAndSessions" 
+  version="1.1" width="2715" height="3046" >
+
+  <title>CSLMON Log: Clients and Sessions [D:\projects\c\cslmon-srvc\make2\logs\files\mo20231207-short-b.log ]</title>
+
+  <style>
+    .timeAxis {
+      stroke: red; 
+      stroke-width: 0.5
+    }
+    .timeLabel {
+      font-family: Arial; 
+      font-size: 8pt;
+      stroke: red;
+    }
+
+    .clientAxis {
+      stroke: navy;
+      stroke-width: 2.5;
+    }
+    .clientLabel {
+      font-family: Arial; 
+      font-size: 7pt;
+      text-anchor: middle;
+      stroke: blue;
+    }
+
+    .sessionAxis {
+      stroke: teal; 
+      stroke-width: 9;
+    }
+    .sessionAxisWait {
+      stroke: red; 
+      stroke-width: 8;
+    }
+    .sessionLabel {
+      font-family: Arial; 
+      font-size: 8pt;
+      stroke: green;
+    }
+
+    .txAxis {
+      stroke: blue; 
+      stroke-width: 0.5;
+    }
+  </style>
+
+  <defs>
+    
+    <symbol id="_10sec" >
+      <path class="timeAxis" d="
+        M 0,0 l 0,7 
+        M 5,0 l 0,3
+        M 10,0 l 0,3
+        M 15,0 l 0,3
+        M 20,0 l 0,3
+        M 25,0 l 0,5
+        M 30,0 l 0,3
+        M 35,0 l 0,3
+        M 40,0 l 0,3
+        M 45,0 l 0,3
+        M 50,0 l 0,7
+        " />
+    </symbol>
+
+    <symbol id="_1min" >
+      <use x="0" y="0" width="50" height="10" xlink:href="#_10sec" />
+      <use x="50" y="0" width="50" height="10" xlink:href="#_10sec" />
+      <use x="100" y="0" width="50" height="10" xlink:href="#_10sec" />
+      <use x="150" y="0" width="50" height="10" xlink:href="#_10sec" />
+      <use x="200" y="0" width="50" height="10" xlink:href="#_10sec" />
+      <use x="250" y="0" width="50" height="10" xlink:href="#_10sec" />
+      <line class="timeAxis" id="L_0" x1="0" y1="0" x2="0" y2="10" style="stroke:navy; stroke-width:1" />
+      <line class="timeAxis" id="L_1" x1="300" y1="0" x2="300" y2="10" style="stroke:navy; stroke-width:1" />
+      <line class="timeAxis" id="L_1" x1="150" y1="0" x2="150" y2="6" style="stroke:navy; stroke-width:1" />
+    </symbol>
+
+  </defs>
+
+  <!-- Begin -->
+    
+      <!-- Scale: Begin -->
+
+  <text x="50" y="30" class="timeLabel" >19:28</text>
+  <use  x="50" y="32" width="300" height="10" xlink:href="#_1min" />
+
+  <text x="350" y="30" class="timeLabel" >19:29</text>
+  <use  x="350" y="32" width="300" height="10" xlink:href="#_1min" />
+
+  <text x="650" y="30" class="timeLabel" >19:30</text>
+  <use  x="650" y="32" width="300" height="10" xlink:href="#_1min" />
+
+  <text x="950" y="30" class="timeLabel" >19:31</text>
+  <use  x="950" y="32" width="300" height="10" xlink:href="#_1min" />
+
+  <text x="1250" y="30" class="timeLabel" >19:32</text>
+  <use  x="1250" y="32" width="300" height="10" xlink:href="#_1min" />
+
+  <text x="1550" y="30" class="timeLabel" >19:33</text>
+  <use  x="1550" y="32" width="300" height="10" xlink:href="#_1min" />
+
+  <text x="1850" y="30" class="timeLabel" >19:34</text>
+  <use  x="1850" y="32" width="300" height="10" xlink:href="#_1min" />
+
+  <text x="2150" y="30" class="timeLabel" >19:35</text>
+  <use  x="2150" y="32" width="300" height="10" xlink:href="#_1min" />
+
+  <text x="2450" y="30" class="timeLabel" >19:36</text>
+  <use  x="2450" y="32" width="300" height="10" xlink:href="#_1min" />
+
+<!-- Scale: End -->
+
+  <!-- Clients: Begin -->
+
+  <line x1="246.995" y1="60"  x2="357.905" y2="60" class="clientAxis" />
+  <text x="246.995" y="57"    class="clientLabel" >1D90</text>
+    <line x1="270" y1="60"  x2="340" y2="60" class="sessionAxis" />
+    <text x="270" y="54"    class="sessionLabel" >001</text>
+    <line x1="270" y1="60"  x2="290" y2="60" class="sessionAxisWait" />
+
+
+  <line x1="246.995" y1="82"  x2="352.855" y2="82" class="clientAxis" />
+  <text x="246.995" y="79"    class="clientLabel" >1DAC</text>
+  <line x1="247.07" y1="104"  x2="355.365" y2="104" class="clientAxis" />
+  <text x="247.07" y="101"    class="clientLabel" >16BC</text>
+  <line x1="247.23" y1="126"  x2="324.46" y2="126" class="clientAxis" />
+  <text x="247.23" y="123"    class="clientLabel" >150C</text>
+  <line x1="247.305" y1="148"  x2="303.905" y2="148" class="clientAxis" />
+  <text x="247.305" y="145"    class="clientLabel" >1310</text>
+  <line x1="247.385" y1="170"  x2="502.33" y2="170" class="clientAxis" />
+  <text x="247.385" y="167"    class="clientLabel" >1044</text>
+  <line x1="247.54" y1="192"  x2="698.34" y2="192" class="clientAxis" />
+  <text x="247.54" y="189"    class="clientLabel" >0AC8</text>
+  <line x1="247.695" y1="214"  x2="506.08" y2="214" class="clientAxis" />
+  <text x="247.695" y="211"    class="clientLabel" >09E0</text>
+  <line x1="247.93" y1="236"  x2="667.12" y2="236" class="clientAxis" />
+  <text x="247.93" y="233"    class="clientLabel" >1F4C</text>
+  <line x1="248.01" y1="258"  x2="420.29" y2="258" class="clientAxis" />
+  <text x="248.01" y="255"    class="clientLabel" >1EEC</text>
+  <line x1="248.245" y1="280"  x2="762.8199" y2="280" class="clientAxis" />
+  <text x="248.245" y="277"    class="clientLabel" >1CE4</text>
+  <line x1="248.245" y1="302"  x2="614.445" y2="302" class="clientAxis" />
+  <text x="248.245" y="299"    class="clientLabel" >1A80</text>
+  <line x1="248.32" y1="324"  x2="610.625" y2="324" class="clientAxis" />
+  <text x="248.32" y="321"    class="clientLabel" >06F4</text>
+  <line x1="249.18" y1="346"  x2="415.135" y2="346" class="clientAxis" />
+  <text x="249.18" y="343"    class="clientLabel" >1E50</text>
+  <line x1="250.195" y1="368"  x2="721.05" y2="368" class="clientAxis" />
+  <text x="250.195" y="365"    class="clientLabel" >1524</text>
+  <line x1="250.195" y1="390"  x2="702.3" y2="390" class="clientAxis" />
+  <text x="250.195" y="387"    class="clientLabel" >1938</text>
+  <line x1="250.195" y1="412"  x2="561.11" y2="412" class="clientAxis" />
+  <text x="250.195" y="409"    class="clientLabel" >1DD4</text>
+  <line x1="250.195" y1="434"  x2="625.44" y2="434" class="clientAxis" />
+  <text x="250.195" y="431"    class="clientLabel" >1EF8</text>
+  <line x1="250.195" y1="456"  x2="382.905" y2="456" class="clientAxis" />
+  <text x="250.195" y="453"    class="clientLabel" >0DA8</text>
+  <line x1="250.195" y1="478"  x2="451.045" y2="478" class="clientAxis" />
+  <text x="250.195" y="475"    class="clientLabel" >1A40</text>
+  <line x1="250.195" y1="500"  x2="403.315" y2="500" class="clientAxis" />
+  <text x="250.195" y="497"    class="clientLabel" >0DEC</text>
+  <line x1="250.195" y1="522"  x2="722.85" y2="522" class="clientAxis" />
+  <text x="250.195" y="519"    class="clientLabel" >05E0</text>
+  <line x1="250.23" y1="544"  x2="684.225" y2="544" class="clientAxis" />
+  <text x="250.23" y="541"    class="clientLabel" >1E5C</text>
+  <line x1="251.58" y1="566"  x2="783.96" y2="566" class="clientAxis" />
+  <text x="251.58" y="563"    class="clientLabel" >10B0</text>
+  <line x1="251.59" y1="588"  x2="768.855" y2="588" class="clientAxis" />
+  <text x="251.59" y="585"    class="clientLabel" >0B50</text>
+  <line x1="251.595" y1="610"  x2="747.21" y2="610" class="clientAxis" />
+  <text x="251.595" y="607"    class="clientLabel" >1780</text>
+  <line x1="251.605" y1="632"  x2="663.275" y2="632" class="clientAxis" />
+  <text x="251.605" y="629"    class="clientLabel" >1DE0</text>
+  <line x1="251.615" y1="654"  x2="466.94" y2="654" class="clientAxis" />
+  <text x="251.615" y="651"    class="clientLabel" >097C</text>
+  <line x1="251.625" y1="676"  x2="478.5" y2="676" class="clientAxis" />
+  <text x="251.625" y="673"    class="clientLabel" >0E08</text>
+  <line x1="251.635" y1="698"  x2="766.04" y2="698" class="clientAxis" />
+  <text x="251.635" y="695"    class="clientLabel" >05B0</text>
+  <line x1="251.65" y1="720"  x2="555.795" y2="720" class="clientAxis" />
+  <text x="251.65" y="717"    class="clientLabel" >04B8</text>
+  <line x1="258.64" y1="742"  x2="2515.305" y2="742" class="clientAxis" />
+  <text x="258.64" y="739"    class="clientLabel" >1C0C</text>
+  <line x1="957.995" y1="764"  x2="1199.655" y2="764" class="clientAxis" />
+  <text x="957.995" y="761"    class="clientLabel" >0964</text>
+  <line x1="958.075" y1="786"  x2="1146.935" y2="786" class="clientAxis" />
+  <text x="958.075" y="783"    class="clientLabel" >0568</text>
+  <line x1="958.155" y1="808"  x2="1066.965" y2="808" class="clientAxis" />
+  <text x="958.155" y="805"    class="clientLabel" >1D20</text>
+  <line x1="958.23" y1="830"  x2="1152.965" y2="830" class="clientAxis" />
+  <text x="958.23" y="827"    class="clientLabel" >1878</text>
+  <line x1="958.31" y1="852"  x2="1143.73" y2="852" class="clientAxis" />
+  <text x="958.31" y="849"    class="clientLabel" >1E90</text>
+  <line x1="958.545" y1="874"  x2="1124.48" y2="874" class="clientAxis" />
+  <text x="958.545" y="871"    class="clientLabel" >1414</text>
+  <line x1="958.545" y1="896"  x2="1162.78" y2="896" class="clientAxis" />
+  <text x="958.545" y="893"    class="clientLabel" >12AC</text>
+  <line x1="958.7" y1="918"  x2="1068.525" y2="918" class="clientAxis" />
+  <text x="958.7" y="915"    class="clientLabel" >1C74</text>
+  <line x1="958.855" y1="940"  x2="1186.61" y2="940" class="clientAxis" />
+  <text x="958.855" y="937"    class="clientLabel" >1FB4</text>
+  <line x1="958.855" y1="962"  x2="1087.235" y2="962" class="clientAxis" />
+  <text x="958.855" y="959"    class="clientLabel" >1848</text>
+  <line x1="958.935" y1="984"  x2="1187.47" y2="984" class="clientAxis" />
+  <text x="958.935" y="981"    class="clientLabel" >056C</text>
+  <line x1="959.09" y1="1006"  x2="1213" y2="1006" class="clientAxis" />
+  <text x="959.09" y="1003"    class="clientLabel" >1974</text>
+  <line x1="959.165" y1="1028"  x2="1123.23" y2="1028" class="clientAxis" />
+  <text x="959.165" y="1025"    class="clientLabel" >1FC0</text>
+  <line x1="959.245" y1="1050"  x2="1179.265" y2="1050" class="clientAxis" />
+  <text x="959.245" y="1047"    class="clientLabel" >1928</text>
+  <line x1="959.405" y1="1072"  x2="1214.72" y2="1072" class="clientAxis" />
+  <text x="959.405" y="1069"    class="clientLabel" >1FE0</text>
+  <line x1="959.48" y1="1094"  x2="1200.34" y2="1094" class="clientAxis" />
+  <text x="959.48" y="1091"    class="clientLabel" >1D04</text>
+  <line x1="959.56" y1="1116"  x2="1099.405" y2="1116" class="clientAxis" />
+  <text x="959.56" y="1113"    class="clientLabel" >14A0</text>
+  <line x1="959.715" y1="1138"  x2="1176.45" y2="1138" class="clientAxis" />
+  <text x="959.715" y="1135"    class="clientLabel" >1DDC</text>
+  <line x1="959.79" y1="1160"  x2="1179.97" y2="1160" class="clientAxis" />
+  <text x="959.79" y="1157"    class="clientLabel" >1C84</text>
+  <line x1="959.875" y1="1182"  x2="1131.11" y2="1182" class="clientAxis" />
+  <text x="959.875" y="1179"    class="clientLabel" >1A90</text>
+  <line x1="960.03" y1="1204"  x2="1204.565" y2="1204" class="clientAxis" />
+  <text x="960.03" y="1201"    class="clientLabel" >1E7C</text>
+  <line x1="960.295" y1="1226"  x2="1200.335" y2="1226" class="clientAxis" />
+  <text x="960.295" y="1223"    class="clientLabel" >1CDC</text>
+  <line x1="960.295" y1="1248"  x2="1175.28" y2="1248" class="clientAxis" />
+  <text x="960.295" y="1245"    class="clientLabel" >1E28</text>
+  <line x1="960.295" y1="1270"  x2="1204.095" y2="1270" class="clientAxis" />
+  <text x="960.295" y="1267"    class="clientLabel" >0788</text>
+  <line x1="960.455" y1="1292"  x2="1211.205" y2="1292" class="clientAxis" />
+  <text x="960.455" y="1289"    class="clientLabel" >1A44</text>
+  <line x1="960.535" y1="1314"  x2="1199.185" y2="1314" class="clientAxis" />
+  <text x="960.535" y="1311"    class="clientLabel" >106C</text>
+  <line x1="960.535" y1="1336"  x2="1132.705" y2="1336" class="clientAxis" />
+  <text x="960.535" y="1333"    class="clientLabel" >1A30</text>
+  <line x1="960.61" y1="1358"  x2="1162.155" y2="1358" class="clientAxis" />
+  <text x="960.61" y="1355"    class="clientLabel" >19C4</text>
+  <line x1="960.92" y1="1380"  x2="1123.075" y2="1380" class="clientAxis" />
+  <text x="960.92" y="1377"    class="clientLabel" >1654</text>
+  <line x1="960.92" y1="1402"  x2="1206.83" y2="1402" class="clientAxis" />
+  <text x="960.92" y="1399"    class="clientLabel" >0430</text>
+  <line x1="961.195" y1="1424"  x2="1196.06" y2="1424" class="clientAxis" />
+  <text x="961.195" y="1421"    class="clientLabel" >1260</text>
+  <line x1="961.26" y1="1446"  x2="1128.16" y2="1446" class="clientAxis" />
+  <text x="961.26" y="1443"    class="clientLabel" >15E8</text>
+  <line x1="1547.305" y1="1468"  x2="1651.345" y2="1468" class="clientAxis" />
+  <text x="1547.305" y="1465"    class="clientLabel" >1138</text>
+  <line x1="1547.305" y1="1490"  x2="1706.105" y2="1490" class="clientAxis" />
+  <text x="1547.305" y="1487"    class="clientLabel" >1D54</text>
+  <line x1="1547.385" y1="1512"  x2="1711.75" y2="1512" class="clientAxis" />
+  <text x="1547.385" y="1509"    class="clientLabel" >1828</text>
+  <line x1="1547.54" y1="1534"  x2="1677.325" y2="1534" class="clientAxis" />
+  <text x="1547.54" y="1531"    class="clientLabel" >1384</text>
+  <line x1="1547.62" y1="1556"  x2="1698.03" y2="1556" class="clientAxis" />
+  <text x="1547.62" y="1553"    class="clientLabel" >1728</text>
+  <line x1="1547.695" y1="1578"  x2="2118.55" y2="1578" class="clientAxis" />
+  <text x="1547.695" y="1575"    class="clientLabel" >1304</text>
+  <line x1="1547.775" y1="1600"  x2="1904.925" y2="1600" class="clientAxis" />
+  <text x="1547.775" y="1597"    class="clientLabel" >0BCC</text>
+  <line x1="1547.93" y1="1622"  x2="2109.62" y2="1622" class="clientAxis" />
+  <text x="1547.93" y="1619"    class="clientLabel" >14EC</text>
+  <line x1="1548.01" y1="1644"  x2="1934.38" y2="1644" class="clientAxis" />
+  <text x="1548.01" y="1641"    class="clientLabel" >08C0</text>
+  <line x1="1548.165" y1="1666"  x2="2111.805" y2="1666" class="clientAxis" />
+  <text x="1548.165" y="1663"    class="clientLabel" >1C48</text>
+  <line x1="1548.245" y1="1688"  x2="1819.1" y2="1688" class="clientAxis" />
+  <text x="1548.245" y="1685"    class="clientLabel" >0E2C</text>
+  <line x1="1548.32" y1="1710"  x2="2094.615" y2="1710" class="clientAxis" />
+  <text x="1548.32" y="1707"    class="clientLabel" >0560</text>
+  <line x1="1548.4" y1="1732"  x2="1890.19" y2="1732" class="clientAxis" />
+  <text x="1548.4" y="1729"    class="clientLabel" >13E0</text>
+  <line x1="1548.555" y1="1754"  x2="1834.725" y2="1754" class="clientAxis" />
+  <text x="1548.555" y="1751"    class="clientLabel" >029C</text>
+  <line x1="1548.635" y1="1776"  x2="1841.69" y2="1776" class="clientAxis" />
+  <text x="1548.635" y="1773"    class="clientLabel" >1CA0</text>
+  <line x1="1548.71" y1="1798"  x2="2033.34" y2="1798" class="clientAxis" />
+  <text x="1548.71" y="1795"    class="clientLabel" >18A4</text>
+  <line x1="1548.79" y1="1820"  x2="1709.905" y2="1820" class="clientAxis" />
+  <text x="1548.79" y="1817"    class="clientLabel" >13FC</text>
+  <line x1="1548.95" y1="1842"  x2="1966.855" y2="1842" class="clientAxis" />
+  <text x="1548.95" y="1839"    class="clientLabel" >1CF8</text>
+  <line x1="1549.025" y1="1864"  x2="1809.8" y2="1864" class="clientAxis" />
+  <text x="1549.025" y="1861"    class="clientLabel" >185C</text>
+  <line x1="1549.18" y1="1886"  x2="2050.31" y2="1886" class="clientAxis" />
+  <text x="1549.18" y="1883"    class="clientLabel" >1F6C</text>
+  <line x1="1549.18" y1="1908"  x2="1744.005" y2="1908" class="clientAxis" />
+  <text x="1549.18" y="1905"    class="clientLabel" >1F00</text>
+  <line x1="1549.26" y1="1930"  x2="2005.54" y2="1930" class="clientAxis" />
+  <text x="1549.26" y="1927"    class="clientLabel" >18C0</text>
+  <line x1="1549.335" y1="1952"  x2="1787.32" y2="1952" class="clientAxis" />
+  <text x="1549.335" y="1949"    class="clientLabel" >15E0</text>
+  <line x1="1549.57" y1="1974"  x2="2084.27" y2="1974" class="clientAxis" />
+  <text x="1549.57" y="1971"    class="clientLabel" >12D0</text>
+  <line x1="1549.57" y1="1996"  x2="1869.415" y2="1996" class="clientAxis" />
+  <text x="1549.57" y="1993"    class="clientLabel" >1C78</text>
+  <line x1="1549.65" y1="2018"  x2="1978.34" y2="2018" class="clientAxis" />
+  <text x="1549.65" y="2015"    class="clientLabel" >1B38</text>
+  <line x1="1549.805" y1="2040"  x2="1804" y2="2040" class="clientAxis" />
+  <text x="1549.805" y="2037"    class="clientLabel" >0580</text>
+  <line x1="1549.885" y1="2062"  x2="1968.73" y2="2062" class="clientAxis" />
+  <text x="1549.885" y="2059"    class="clientLabel" >1790</text>
+  <line x1="1549.96" y1="2084"  x2="1871.615" y2="2084" class="clientAxis" />
+  <text x="1549.96" y="2081"    class="clientLabel" >1E08</text>
+  <line x1="1550.12" y1="2106"  x2="2094.625" y2="2106" class="clientAxis" />
+  <text x="1550.12" y="2103"    class="clientLabel" >16B0</text>
+  <line x1="1550.195" y1="2128"  x2="1943.305" y2="2128" class="clientAxis" />
+  <text x="1550.195" y="2125"    class="clientLabel" >1948</text>
+  <line x1="1550.275" y1="2150"  x2="2032.66" y2="2150" class="clientAxis" />
+  <text x="1550.275" y="2147"    class="clientLabel" >1D48</text>
+  <line x1="2271.46" y1="2172"  x2="2453.195" y2="2172" class="clientAxis" />
+  <text x="2271.46" y="2169"    class="clientLabel" >0E24</text>
+  <line x1="2271.46" y1="2194"  x2="2460.73" y2="2194" class="clientAxis" />
+  <text x="2271.46" y="2191"    class="clientLabel" >1650</text>
+  <line x1="2271.535" y1="2216"  x2="2506.78" y2="2216" class="clientAxis" />
+  <text x="2271.535" y="2213"    class="clientLabel" >1A10</text>
+  <line x1="2271.615" y1="2238"  x2="2438.05" y2="2238" class="clientAxis" />
+  <text x="2271.615" y="2235"    class="clientLabel" >1D98</text>
+  <line x1="2271.695" y1="2260"  x2="2426.72" y2="2260" class="clientAxis" />
+  <text x="2271.695" y="2257"    class="clientLabel" >16B4</text>
+  <line x1="2271.85" y1="2282"  x2="2408.705" y2="2282" class="clientAxis" />
+  <text x="2271.85" y="2279"    class="clientLabel" >19B0</text>
+  <line x1="2271.93" y1="2304"  x2="2427.035" y2="2304" class="clientAxis" />
+  <text x="2271.93" y="2301"    class="clientLabel" >1E18</text>
+  <line x1="2272.005" y1="2326"  x2="2513.52" y2="2326" class="clientAxis" />
+  <text x="2272.005" y="2323"    class="clientLabel" >1174</text>
+  <line x1="2272.085" y1="2348"  x2="2515.305" y2="2348" class="clientAxis" />
+  <text x="2272.085" y="2345"    class="clientLabel" >1DC4</text>
+  <line x1="2272.24" y1="2370"  x2="2426.72" y2="2370" class="clientAxis" />
+  <text x="2272.24" y="2367"    class="clientLabel" >1580</text>
+  <line x1="2272.32" y1="2392"  x2="2457.64" y2="2392" class="clientAxis" />
+  <text x="2272.32" y="2389"    class="clientLabel" >122C</text>
+  <line x1="2272.475" y1="2414"  x2="2398.03" y2="2414" class="clientAxis" />
+  <text x="2272.475" y="2411"    class="clientLabel" >1B0C</text>
+  <line x1="2272.55" y1="2436"  x2="2457.485" y2="2436" class="clientAxis" />
+  <text x="2272.55" y="2433"    class="clientLabel" >0858</text>
+  <line x1="2272.63" y1="2458"  x2="2407.785" y2="2458" class="clientAxis" />
+  <text x="2272.63" y="2455"    class="clientLabel" >0870</text>
+  <line x1="2272.71" y1="2480"  x2="2476.84" y2="2480" class="clientAxis" />
+  <text x="2272.71" y="2477"    class="clientLabel" >0AA0</text>
+  <line x1="2273.025" y1="2502"  x2="2513.53" y2="2502" class="clientAxis" />
+  <text x="2273.025" y="2499"    class="clientLabel" >0224</text>
+  <line x1="2273.025" y1="2524"  x2="2457.89" y2="2524" class="clientAxis" />
+  <text x="2273.025" y="2521"    class="clientLabel" >1C8C</text>
+  <line x1="2273.025" y1="2546"  x2="2507.485" y2="2546" class="clientAxis" />
+  <text x="2273.025" y="2543"    class="clientLabel" >13DC</text>
+  <line x1="2273.175" y1="2568"  x2="2508.265" y2="2568" class="clientAxis" />
+  <text x="2273.175" y="2565"    class="clientLabel" >1070</text>
+  <line x1="2273.255" y1="2590"  x2="2511" y2="2590" class="clientAxis" />
+  <text x="2273.255" y="2587"    class="clientLabel" >0364</text>
+  <line x1="2273.335" y1="2612"  x2="2509.67" y2="2612" class="clientAxis" />
+  <text x="2273.335" y="2609"    class="clientLabel" >1F44</text>
+  <line x1="2273.415" y1="2634"  x2="2458.15" y2="2634" class="clientAxis" />
+  <text x="2273.415" y="2631"    class="clientLabel" >0EF4</text>
+  <line x1="2273.57" y1="2656"  x2="2477.86" y2="2656" class="clientAxis" />
+  <text x="2273.57" y="2653"    class="clientLabel" >1540</text>
+  <line x1="2273.645" y1="2678"  x2="2407.795" y2="2678" class="clientAxis" />
+  <text x="2273.645" y="2675"    class="clientLabel" >12F0</text>
+  <line x1="2273.8" y1="2700"  x2="2513.505" y2="2700" class="clientAxis" />
+  <text x="2273.8" y="2697"    class="clientLabel" >0FC8</text>
+  <line x1="2273.88" y1="2722"  x2="2477.47" y2="2722" class="clientAxis" />
+  <text x="2273.88" y="2719"    class="clientLabel" >1D0C</text>
+  <line x1="2273.965" y1="2744"  x2="2477.08" y2="2744" class="clientAxis" />
+  <text x="2273.965" y="2741"    class="clientLabel" >114C</text>
+  <line x1="2274.035" y1="2766"  x2="2513.535" y2="2766" class="clientAxis" />
+  <text x="2274.035" y="2763"    class="clientLabel" >1D64</text>
+  <line x1="2274.035" y1="2788"  x2="2427.035" y2="2788" class="clientAxis" />
+  <text x="2274.035" y="2785"    class="clientLabel" >1DB0</text>
+  <line x1="2274.27" y1="2810"  x2="2514.055" y2="2810" class="clientAxis" />
+  <text x="2274.27" y="2807"    class="clientLabel" >10B0</text>
+  <line x1="2274.585" y1="2832"  x2="2511" y2="2832" class="clientAxis" />
+  <text x="2274.585" y="2829"    class="clientLabel" >11A0</text>
+  <line x1="2274.585" y1="2854"  x2="2508.265" y2="2854" class="clientAxis" />
+  <text x="2274.585" y="2851"    class="clientLabel" >0CB8</text>
+<!-- Clients: End -->
+
+
+
+  <!-- End -->
+</svg>    
+    

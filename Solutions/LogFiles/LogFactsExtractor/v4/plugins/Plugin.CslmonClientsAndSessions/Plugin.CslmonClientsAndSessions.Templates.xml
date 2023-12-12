@@ -1,8 +1,241 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Registry savedAt="2019-08-29:14:52:00.00000" application="LogFactsExtractor">
-  <Key name="default">
-    <Item name="default" type="string">@</Item>
-  </Key>
-  <Key name="SVG">
-  </Key>
-</Registry>
+<Templates savedAt="2019-08-29:14:52:00.00000" application="LogFactsExtractor">
+  
+  <Template name="SVG">
+    
+    <Header>
+    <![CDATA[<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20001102//EN" "http://www.w3.org/TR/2000/CR-SVG-20001102/DTD/svg-20001102.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" 
+  xmlns:xlink="http://www.w3.org/1999/xlink" 
+  id="CSLMON-ClientsAndSessions" 
+  version="1.1" width="$(drawingWidth)" height="$(drawingHeight)" >
+
+  <title>CSLMON Log: Clients and Sessions [$(LogFilename)]</title>
+
+  <style>
+    .timeAxis {
+      stroke: red; 
+      stroke-width: 0.5
+    }
+    .timeVAxisMin {
+      stroke: gray; 
+      stroke-width: 0.7
+    }
+    .timeVAxisHalfMin {
+      stroke: silver; 
+      stroke-width: 0.5
+    }
+    .timeVAxisQuarterMin {
+      stroke: silver; 
+      stroke-width: 0.2
+    }
+    .timeLabel {
+      font-family: Arial; 
+      font-size: 8pt;
+      fill: red;
+    }
+
+    .clientAxis {
+      stroke: navy;
+      stroke-width: 2.5;
+    }
+    .clientLabel {
+      font-family: Arial; 
+      font-size: 7pt;
+      text-anchor: end;
+      fill: blue;
+    }
+
+    .sessionAxis {
+      stroke: teal; 
+      stroke-width: 8;
+    }
+    .sessionAxisWait {
+      stroke: silver; 
+      stroke-width: 6;
+    }
+    .sessionAxisInit {
+      stroke: magenta; 
+      stroke-width: 6;
+    }
+    .sessionLabel {
+      font-family: Arial; 
+      font-size: 4pt;
+      font-weight: lighter;
+      fill: green;
+      writing-mode: tb;
+      text-anchor: end;
+    }
+
+    .txAxis {
+      stroke: blue; 
+      stroke-width: 0.5;
+    }
+  </style>
+
+  <defs>
+    
+    <symbol id="_10sec" >
+      <path class="timeAxis" d="
+        M 0,0 l 0,7 
+        M 5,0 l 0,3
+        M 10,0 l 0,3
+        M 15,0 l 0,3
+        M 20,0 l 0,3
+        M 25,0 l 0,5
+        M 30,0 l 0,3
+        M 35,0 l 0,3
+        M 40,0 l 0,3
+        M 45,0 l 0,3
+        M 50,0 l 0,7
+        " />
+    </symbol>
+
+    <symbol id="_1min" >
+      <use x="0" y="0" width="50" height="10" xlink:href="#_10sec" />
+      <use x="50" y="0" width="50" height="10" xlink:href="#_10sec" />
+      <use x="100" y="0" width="50" height="10" xlink:href="#_10sec" />
+      <use x="150" y="0" width="50" height="10" xlink:href="#_10sec" />
+      <use x="200" y="0" width="50" height="10" xlink:href="#_10sec" />
+      <use x="250" y="0" width="50" height="10" xlink:href="#_10sec" />
+      <line class="timeAxis" id="L_0" x1="0" y1="0" x2="0" y2="10" style="stroke:navy; stroke-width:1" />
+      <line class="timeAxis" id="L_1" x1="300" y1="0" x2="300" y2="10" style="stroke:navy; stroke-width:1" />
+      <line class="timeAxis" id="L_1" x1="150" y1="0" x2="150" y2="6" style="stroke:navy; stroke-width:1" />
+      
+      <line class="timeVAxisMin"        id="L_MB"    x1="0"   y1="12" x2="0"   y2="$(drawingHeight)" />
+      <line class="timeVAxisHalfMin"    id="L_Mhalf" x1="150" y1="12" x2="150" y2="$(drawingHeight)" />
+      <line class="timeVAxisQuarterMin" id="L_Mq1"   x1="75"  y1="12" x2="75" y2="$(drawingHeight)" />
+      <line class="timeVAxisQuarterMin" id="L_Mq2"   x1="225" y1="12" x2="225" y2="$(drawingHeight)" />
+    </symbol>
+
+  </defs>
+
+  <!-- Begin -->
+    
+    ]]></Header>
+    
+    <Item><![CDATA[
+      $(Item)
+    ]]></Item>
+    
+    <Footer><![CDATA[
+
+  <!-- End -->
+</svg>    
+    ]]></Footer>
+    
+  </Template>
+
+  
+  <!-- ***** [TimeScale] **************************************************************** -->
+  
+  <Template name="TimeScale">
+    
+    <Header><![CDATA[
+  <!-- Scale: Begin -->
+
+    ]]></Header>
+    
+    <Item><![CDATA[
+      <text x="$(x)" y="$(yLabel)" class="timeLabel" >$(time)</text>
+      <use  x="$(x)" y="$(y)" width="300" height="$(drawingHeight)" xlink:href="#_1min" />
+      
+    ]]></Item>
+    
+    <Footer><![CDATA[
+  <!-- Scale: End -->    
+    ]]></Footer>
+    
+  </Template>
+
+
+  <!-- ***** [Clients] ****************************************************************** -->
+
+  <Template name="Clients">
+    
+    <Header><![CDATA[
+  <!-- Clients: Begin -->
+
+    ]]></Header>
+
+    <Item><![CDATA[
+      <line x1="$(clientTimeStartX)" y1="$(clientTimeY)"  x2="$(clientTimeFinishX)" y2="$(clientTimeY)" class="clientAxis" />
+      <text x="$(clientTimeStartX)" y="$(clientTimeYlab)"    class="clientLabel" >$(ClientLabel)</text>
+      
+    ]]></Item>
+
+    <Footer><![CDATA[
+  <!-- Clients: End -->    
+    ]]></Footer>
+    
+  </Template>
+
+  <!-- ***** [SessionRefs] ****************************************************************** -->
+
+  <Template name="SessionRefs">
+
+    <Header><![CDATA[
+  <!-- SessionRefs: Begin -->
+
+    ]]>
+    </Header>
+
+    <Item><![CDATA[
+      <line x1="$(sessionTimeStartX)" y1="$(sessionTimeY)"  x2="$(sessionTimeFinishX)" y2="$(sessionTimeY)" class="sessionAxis" />
+      <text x="$(sessionTimeStartX)" y="$(sessionTimeYlab)"   class="sessionLabel" >$(SessionLabel)</text>
+      
+    ]]></Item>
+
+    <Footer><![CDATA[
+  <!-- SessionRefs: End -->    
+    ]]></Footer>
+
+  </Template>
+
+  <!-- ***** [SessionInitializations] ****************************************************************** -->
+
+  <Template name="SessionInitializations">
+
+    <Header><![CDATA[
+  <!-- SessionInitializations: Begin -->
+
+    ]]>
+    </Header>
+
+    <Item><![CDATA[
+      <line x1="$(sessionTimeStartX)" y1="$(sessionTimeY)"  x2="$(sessionTimeFinishX)" y2="$(sessionTimeY)" class="sessionAxisInit" />
+      
+    ]]></Item>
+
+    <Footer><![CDATA[
+  <!-- SessionInitializations: End -->    
+    ]]>
+    </Footer>
+
+  </Template>
+
+  <!-- ***** [SessionInitWaits] ****************************************************************** -->
+
+  <Template name="SessionInitWaits">
+
+    <Header><![CDATA[
+  <!-- SessionInitWaits: Begin -->
+
+    ]]>
+    </Header>
+
+    <Item><![CDATA[
+      <line x1="$(sessionTimeStartX)" y1="$(sessionTimeY)"  x2="$(sessionTimeFinishX)" y2="$(sessionTimeY)" class="sessionAxisWait" />
+      
+    ]]>
+    </Item>
+
+    <Footer><![CDATA[
+  <!-- SessionInitWaits: End -->    
+    ]]>
+    </Footer>
+
+  </Template>
+
+</Templates>

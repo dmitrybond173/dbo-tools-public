@@ -1,0 +1,110 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20001102//EN" "http://www.w3.org/TR/2000/CR-SVG-20001102/DTD/svg-20001102.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" 
+     xmlns:xlink="http://www.w3.org/1999/xlink" 
+     id="CSLMON-ClientsAndSessions" 
+     version="1.1" width="1280" height="1680" >
+
+  <title>CSLMON Log: Clients and Sessions</title>
+
+  <style>
+    .timeAxis {
+      stroke: red; 
+      stroke-width: 0.5
+    }
+    .timeLabel {
+      font-family: Arial; 
+      font-size: 8pt;
+      stroke: red;
+    }
+
+    .clientAxis {
+      stroke: navy;
+      stroke-width: 1;
+    }
+    .clientLabel {
+      font-family: Arial; 
+      font-size: 8pt;
+      text-anchor: middle;
+      stroke: blue;
+    }
+
+    .sessionAxis {
+      stroke: teal; 
+      stroke-width: 8;
+    }
+    .sessionAxisWait {
+      stroke: red; 
+      stroke-width: 8;
+    }
+    .sessionLabel {
+      font-family: Arial; 
+      font-size: 8pt;
+      stroke: green;
+    }
+  </style>
+
+  <defs>
+    
+    <symbol id="_10sec" >
+      <path class="timeAxis" d="
+        M 0,0 l 0,7 
+        M 5,0 l 0,3
+        M 10,0 l 0,3
+        M 15,0 l 0,3
+        M 20,0 l 0,3
+        M 25,0 l 0,5
+        M 30,0 l 0,3
+        M 35,0 l 0,3
+        M 40,0 l 0,3
+        M 45,0 l 0,3
+        M 50,0 l 0,7
+        " />
+    </symbol>
+
+    <symbol id="_1min" >
+      <use x="0" y="0" width="50" height="10" xlink:href="#_10sec" />
+      <use x="50" y="0" width="50" height="10" xlink:href="#_10sec" />
+      <use x="100" y="0" width="50" height="10" xlink:href="#_10sec" />
+      <use x="150" y="0" width="50" height="10" xlink:href="#_10sec" />
+      <use x="200" y="0" width="50" height="10" xlink:href="#_10sec" />
+      <use x="250" y="0" width="50" height="10" xlink:href="#_10sec" />
+      <line class="timeAxis" id="L_0" x1="0" y1="0" x2="0" y2="10" style="stroke:navy; stroke-width:1" />
+      <line class="timeAxis" id="L_1" x1="300" y1="0" x2="300" y2="10" style="stroke:navy; stroke-width:1" />
+      <line class="timeAxis" id="L_1" x1="150" y1="0" x2="150" y2="6" style="stroke:navy; stroke-width:1" />
+    </symbol>
+
+  </defs>
+
+  <!-- Begin -->
+
+  <!-- Scale: Begin -->
+
+  <text x="50" y="24" class="timeLabel" >12:05</text>
+  <use  x="50" y="26" width="300" height="10" xlink:href="#_1min" />
+    <text x="350" y="24" class="timeLabel" >12:06</text>
+    <use  x="350" y="26" width="300" height="10" xlink:href="#_1min" />
+    <text x="650" y="24" class="timeLabel" >12:07</text>
+    <use  x="650" y="26" width="300" height="10" xlink:href="#_1min" />
+    <text x="950" y="24" class="timeLabel" >12:08</text>
+    <use  x="950" y="26" width="300" height="10" xlink:href="#_1min" />
+
+  <!-- Scale: End -->
+
+  <!-- Clients: Begin -->
+
+  <line id="CL01" x1="60" y1="60" x2="950" y2="60" class="clientAxis" />
+  <text id="CL01lab" x="60" y="58" class="clientLabel" >192.168.18.1:57183</text>
+
+  <!-- Clients: End -->
+
+  <!-- Sessions: Begin -->
+
+  <line id="EX01" x1="260" y1="60" x2="570" y2="60" class="sessionAxis" />
+  <line id="EX01w" x1="260" y1="60" x2="300" y2="60" class="sessionAxisWait" />
+  <text id="EX01lab" x="260" y="54" class="sessionLabel" >002</text>
+
+  <!-- Sessions: End -->
+
+  <!-- End -->
+</svg>
