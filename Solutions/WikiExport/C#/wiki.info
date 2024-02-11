@@ -1,0 +1,26 @@
+Pieces from wiki pages...
+
+http://btowiki.jda.corp.local/index.php/Special:AllPages
+
+http://btowiki.jda.corp.local/index.php/Special:Export  
+
+=== dropdown list on old MediaWiki (version 1.18)
+
+<select id="namespace" name="namespace" class="namespaceselector">
+<option value="0" selected="selected">(Main)</option>
+<option value="1">Talk</option>
+<option value="2">User</option>
+<option value="3">User talk</option>
+<option value="4">BTO Wiki</option>
+<option value="5">BTO Wiki talk</option>
+<option value="6">File</option>
+<option value="7">File talk</option>
+<option value="8">MediaWiki</option>
+<option value="9">MediaWiki talk</option>
+<option value="10">Template</option>
+<option value="11">Template talk</option>
+<option value="12">Help</option>
+<option value="13">Help talk</option>
+<option value="14">Category</option>
+<option value="15">Category talk</option>
+</select>
