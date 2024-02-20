@@ -16,7 +16,7 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
 using XService.Utils;
 
-namespace ImportWiki
+namespace Wiki.Import
 {
     public class WikiBrowser
     {
@@ -26,8 +26,14 @@ namespace ImportWiki
         public WikiBrowser(string pWikiBaseUrl) 
         {
             this.WikiBaseUrl = pWikiBaseUrl;
+
             //this.Driver = new ChromeDriver();
-            this.Driver = new FirefoxDriver();
+
+            var ffOptions = new FirefoxOptions();
+            ffOptions.AcceptInsecureCertificates = true;
+            this.Driver = new FirefoxDriver(ffOptions);
+
+            //object x = this.Driver.Capabilities.GetCapability("acceptInsecureCerts");
         }
 
         public string WikiBaseUrl { get; protected set; }
@@ -37,13 +43,19 @@ namespace ImportWiki
 
         public void LoginToWiki(string pUser, string pPassword) 
         {
+            Trace.WriteLine(string.Format("--- Wiki.Login[{0}, *****]", pUser));
+
             this.CurrentUrl = resolveUrl("${WikiBaseUrl}/index.php?title=Special:UserLogin");
             Driver.Navigate().GoToUrl(this.CurrentUrl);
 
             var name = Driver.FindElement(By.Name("wpName"));
-            var passw = Driver.FindElement(By.Name("wpPassword"));
             name.SendKeys(pUser);
-            passw.SendKeys(pPassword);
+
+            if (pPassword != null)
+            {
+                var passw = Driver.FindElement(By.Name("wpPassword"));
+                passw.SendKeys(pPassword);
+            }
 
             IWebElement loginButton = Driver.FindElement(By.Name("wploginattempt"));
             loginButton.Click();
@@ -61,6 +73,8 @@ namespace ImportWiki
 
         public void SubmitWikiPage()
         {
+            Trace.WriteLine(string.Format("--- Wiki.SubmitPage()"));
+
             var textArea = Driver.FindElement(By.Name("wpTextbox1"));
             string txt = CurrentPage.LatestRevision.Text;
 

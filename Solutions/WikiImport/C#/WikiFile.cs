@@ -16,7 +16,7 @@ using System.Text;
 using System.Xml;
 using XService.Utils;
 
-namespace ImportWiki
+namespace Wiki.Import
 {
     public class WikiFile
     {
