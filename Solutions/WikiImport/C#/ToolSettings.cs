@@ -57,6 +57,8 @@ namespace Wiki.Import
             "Supported options:\r\n" +
             "  -?  - print this message\r\n" +
             "  -cd, --change-dir={directory}  - switch directory when started\n" +
+            "  -ipl, --include-pages-list={filename}  - list of pages to include\n" +
+            "  -epl, --exclude-pages-list={filename}  - list of pages to exclude\n" +
             "  -p, --pause={list}  - set pause params, comma-separated list of: error, begin, end, always\n" +
             "  -simulation  - simulation mode\n" +
             "  -wu, --wiki-user={wikiUserName}  - wiki user name\n" +
@@ -99,6 +101,9 @@ namespace Wiki.Import
         public string BaseWikiUrl = "http://localhost:8080/w";
         public string WikiUser = null;
         public string WikiPassword = null;
+        public List<string> ExcludePages = null;
+        public List<string> IncludePages = null;
+        public string UrlReservedChars = " !#$&'()*+,/:;=?@[]";
 
         public ToolSettings()
         {
@@ -144,6 +149,22 @@ namespace Wiki.Import
             dupOut(string.Format("* args[{0} items]: {1}", ToolSettings.Arguments.Length, StrUtils.Join(ToolSettings.Arguments, "  ")));
             dupOut(string.Format("* dir: {0}", Directory.GetCurrentDirectory()));
             dupOut(string.Format("* HostInfo: {0}\n", CommonUtils.HostInfoStamp()));
+        }
+
+        public string UrlEncode(string pText)
+        {
+            if (pText.IndexOfAny(UrlReservedChars.ToCharArray()) < 0) 
+                return pText;
+
+            string result = "";
+            foreach (char ch in pText)
+            { 
+                if (UrlReservedChars.IndexOf(ch) >= 0)
+                    result += string.Format("%{0}", ((int)ch).ToString("X2"));
+                else
+                    result += ch;
+            }
+            return result;
         }
 
         public bool ParseCmdLine(string[] args)
@@ -266,6 +287,18 @@ namespace Wiki.Import
                     throw new ToolError(string.Format("Directory [{0}] is not found!", pv));
                 this.ChangeDir = pv;
             }
+            else if (StrUtils.IsSameText(pn, "epl") || StrUtils.IsSameText(pn, "exclude-pages-list"))
+            {
+                if (!File.Exists(pv))
+                    throw new ToolError(string.Format("File [{0}] is not found!", pv));
+                this.ExcludePages = loadFilesList(pv);
+            }
+            else if (StrUtils.IsSameText(pn, "ipl") || StrUtils.IsSameText(pn, "include-pages-list"))
+            {
+                if (!File.Exists(pv))
+                    throw new ToolError(string.Format("File [{0}] is not found!", pv));
+                this.IncludePages = loadFilesList(pv);
+            }
             else if (pn == "p" || pn == "pause")
             {
                 setPause(pv);
@@ -300,6 +333,21 @@ namespace Wiki.Import
             return result;
         }
 
+        private List<string> loadFilesList(string pFilename)
+        {
+            List<string> list = new List<string>();            
+            using (StreamReader sr = File.OpenText(pFilename))
+            {
+                while (!sr.EndOfStream)
+                {
+                    string ln = sr.ReadLine().Trim().ToLower();
+                    if (string.IsNullOrEmpty(ln)) continue;
+                    list.Add(ln);
+                }
+            }
+            return list;
+        }
+
         private void setPause(string pv)
         {
             if (pv == "") pv = "End";
@@ -327,23 +375,28 @@ namespace Wiki.Import
             // load default CLI params from config
             foreach (string k in ConfigurationManager.AppSettings.AllKeys)
             {
-                if (!k.ToLower().StartsWith("cli:")) continue;
-
-                string pn = k.Remove(0, 4).Trim().ToLower();
                 string s = ConfigurationManager.AppSettings[k];
 
-                // special case: CLI:input processed separately
-                if (StrUtils.IsSameText(pn, "input"))
+                if (StrUtils.IsSameText(k, "UrlReservedChars"))
                 {
-                    setSourceFile(s);
+                    UrlReservedChars = s;
                 }
-                else
+                else if (k.ToLower().StartsWith("cli:"))
                 {
-                    string pv = s;
-                    string arg = string.Format("cfg[{0}] = {1}", k, pv);
-                    parseCliParam(arg, pn, pv);
-                }
+                    string pn = k.Remove(0, 4).Trim().ToLower();
 
+                    // special case: CLI:input processed separately
+                    if (StrUtils.IsSameText(pn, "input"))
+                    {
+                        setSourceFile(s);
+                    }
+                    else
+                    {
+                        string pv = s;
+                        string arg = string.Format("cfg[{0}] = {1}", k, pv);
+                        parseCliParam(arg, pn, pv);
+                    }
+                }
             }
         }
 

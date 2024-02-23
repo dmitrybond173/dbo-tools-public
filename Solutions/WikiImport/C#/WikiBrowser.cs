@@ -23,9 +23,10 @@ namespace Wiki.Import
         public const string TEMPLATE_PageEditUrl = "${WikiBaseUrl}/index.php?title=${PageTitle}&action=edit";
         public const int CHUNK_SIZE = 0x2000;
 
-        public WikiBrowser(string pWikiBaseUrl) 
+        public WikiBrowser(ToolSettings pSettings) 
         {
-            this.WikiBaseUrl = pWikiBaseUrl;
+            this.Settings = pSettings;
+            this.WikiBaseUrl = this.Settings.BaseWikiUrl;
 
             //this.Driver = new ChromeDriver();
 
@@ -35,6 +36,8 @@ namespace Wiki.Import
 
             //object x = this.Driver.Capabilities.GetCapability("acceptInsecureCerts");
         }
+
+        public ToolSettings Settings { get; protected set; }
 
         public string WikiBaseUrl { get; protected set; }
         public FirefoxDriver Driver { get; protected set; }
@@ -75,7 +78,11 @@ namespace Wiki.Import
         {
             Trace.WriteLine(string.Format("--- Wiki.SubmitPage()"));
 
-            var textArea = Driver.FindElement(By.Name("wpTextbox1"));
+            WebElement textArea = (WebElement)Driver.FindElement(By.Name("wpTextbox1"));
+            textArea.Clear();
+            //textArea.SendKeys(Keys.CONTROL, 'a');
+            //textArea.SendKeys(Keys.DELETE);
+
             string txt = CurrentPage.LatestRevision.Text;
 
             // WARNING!
@@ -116,12 +123,17 @@ namespace Wiki.Import
             return result.ToArray();
         }
 
+
+
         private string resolveUrl(string pUrl)
         {
             string result = pUrl;
             result = StrUtils.ReplaceCI(result, "${WikiBaseUrl}", this.WikiBaseUrl);
             if (this.CurrentPage != null)
-                result = StrUtils.ReplaceCI(result, "${PageTitle}", this.CurrentPage.Title);
+            {
+                string title = this.Settings.UrlEncode(this.CurrentPage.Title);
+                result = StrUtils.ReplaceCI(result, "${PageTitle}", title);
+            }
             return result;
         }
 

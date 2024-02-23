@@ -136,13 +136,25 @@ namespace Wiki.Import
                 return;
             }
 
-            WikiBrowser saver = new WikiBrowser(this.settings.BaseWikiUrl);
+            WikiBrowser saver = new WikiBrowser(this.settings);
 
             if (this.settings.WikiUser != null)
                 saver.LoginToWiki(this.settings.WikiUser, this.settings.WikiPassword);
 
             foreach (WikiFile.Page pg in file.Pages)
             {
+                string id = pg.Title;
+                if (this.settings.ExcludePages != null && this.settings.ExcludePages.Contains(id.ToLower()))
+                {
+                    Trace.WriteLine(string.Format("--- Exclude page: {0}", pg.Title));
+                    continue;
+                }
+                if (this.settings.IncludePages != null && !this.settings.IncludePages.Contains(id.ToLower()))
+                {
+                    Trace.WriteLine(string.Format("--- Page is not included: {0}", pg.Title));
+                    continue;
+                }
+
                 saver.OpenWikiEditor(pg);
                 saver.SubmitWikiPage();
 
