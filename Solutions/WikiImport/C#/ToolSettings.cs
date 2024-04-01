@@ -21,6 +21,8 @@ using System.Xml;
 //using System.Security.RightsManagement;
 using Microsoft.SqlServer.Server;
 using System.Web;
+using OpenQA.Selenium.DevTools.V117.Network;
+
 #if _UseDB
 using System.Data.SQLite;
 #endif
@@ -56,6 +58,8 @@ namespace Wiki.Import
             "\r\n" +
             "Supported options:\r\n" +
             "  -?  - print this message\r\n" +
+            "  -act, --action={actionName}  - wiki-import action to execute\n" +
+            "      Supported values are: Import (default), ImportFiles, ExportFiles\n" +
             "  -cd, --change-dir={directory}  - switch directory when started\n" +
             "  -ipl, --include-pages-list={filename}  - list of pages to include\n" +
             "  -epl, --exclude-pages-list={filename}  - list of pages to exclude\n" +
@@ -66,11 +70,10 @@ namespace Wiki.Import
             "  -url={baseWikiUrl}  - base wiki url\n" +
             "\r\n" +
             "Examples:\r\n" +
-            "  0. Run normally (UI mode)\r\n" +
-            "    $(AppName)\r\n" +
-            "\r\n" +
-            "  1. Run from command line\r\n" +
-            "    $(AppName) c:\\bank\\private\\data\\*.txt\r\n" +
+            "  0. Import from specified XML backup into wiki site\r\n" +
+            "    $(AppName) MyWikiBckp.xml -url=http://localhost:8080/w -wu=dbondare -wp=Forget1234 -epl=excludedPages.txt\r\n" +
+            "  1. Export files from wiki site to disk\r\n" +
+            "    $(AppName) MyWikiBckp.xml -act=ExportFiles -url=http://localhost:8080/w -wu=dbondare -wp=Forget1234\r\n" +
             "\r\n" +
             "";
 
@@ -86,6 +89,13 @@ namespace Wiki.Import
             Always  = Error | Begin | End
         };
 
+        public enum EAction
+        { 
+            Import,
+            ExportFiles,
+            ImportFiles,
+        }
+
         public static ToolSettings Instance = null;
         public static string[] Arguments = null;
         public static Dictionary<string, string> VersionInfo = new Dictionary<string, string>();
@@ -93,6 +103,7 @@ namespace Wiki.Import
         public string AppTitle, AppCopyright, AppVersion, AppFileVersion;
 
         public DateTime StartTs;
+        public EAction Action = EAction.Import;
         public bool Continue = true;
         public bool Simulation = false;
         public string ChangeDir = null;
@@ -281,6 +292,10 @@ namespace Wiki.Import
                 displayHelp();
                 return false;
             }
+            else if (StrUtils.IsSameText(pn, "act") || StrUtils.IsSameText(pn, "action"))
+            {
+                setAction(pv);
+            }
             else if (StrUtils.IsSameText(pn, "cd") || StrUtils.IsSameText(pn, "change-dir"))
             {
                 if (!Directory.Exists(pv))
@@ -346,6 +361,21 @@ namespace Wiki.Import
                 }
             }
             return list;
+        }
+
+        private void setAction(string pv)
+        {
+            if (pv == "") pv = EAction.Import.ToString();
+            try
+            {
+                EAction v = (EAction)Enum.Parse(typeof(EAction), pv, true);
+                this.Action = v;
+            }
+            catch (Exception exc)
+            {
+                Trace.WriteLineIf(TrcLvl.TraceError, TrcLvl.TraceError ? string.Format("!CLI.WrongValue(action={0}): {1}", 
+                    pv, ErrorUtils.FormatErrorMsg(exc)) : "");
+            }
         }
 
         private void setPause(string pv)

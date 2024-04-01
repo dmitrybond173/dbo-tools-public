@@ -132,6 +132,7 @@ namespace Plugin.CslmonClientsAndSessions
             scp.AddHeader();
 
             // ----- add time scale
+
             Trace.WriteLine(string.Format(" + adding TimeScale..."));
             TimeSpan tStep = new TimeSpan(0, 1, 0);
             DateTime tScale = this.Metrics.ScaleStart;
@@ -157,6 +158,7 @@ namespace Plugin.CslmonClientsAndSessions
             int clientIdx, clientLineY;
 
             // ----- add client life-time lines
+
             Trace.WriteLine(string.Format(" + adding clients ({0} items)...", this.Doc.Clients.Count));
             scp.Start("Clients");
             scp.AddHeader();
@@ -189,6 +191,7 @@ namespace Plugin.CslmonClientsAndSessions
             this.Generator.AddItem(clientsCode, null);
 
             // ----- add session refs
+
             Trace.WriteLine(string.Format(" + adding client session refs..."));
             scp.Start("SessionRefs");
             scp.AddHeader();
@@ -226,6 +229,7 @@ namespace Plugin.CslmonClientsAndSessions
             this.Generator.AddItem(sessionRefsCode, null);
 
             // ----- add session init waits
+
             Trace.WriteLine(string.Format(" + adding client session waits..."));
             scp.Start("SessionInitWaits");
             scp.AddHeader();
@@ -262,6 +266,7 @@ namespace Plugin.CslmonClientsAndSessions
             this.Generator.AddItem(sessionInitWaitsCode, null);
 
             // ----- add session inits
+
             Trace.WriteLine(string.Format(" + adding client session initializations..."));
             scp.Start("SessionInitializations");
             scp.AddHeader();
@@ -296,7 +301,77 @@ namespace Plugin.CslmonClientsAndSessions
             string sessionInitCode = scp.Finish();
             this.Generator.AddItem(sessionInitCode, null);
 
+            // ----- add BTO calls
+
+            Trace.WriteLine(string.Format(" + adding BTO calls..."));
+            scp.Start("BtoCalls");
+            scp.AddHeader();
+            clientLineY = 60;
+            clientIdx = 0;
+            foreach (Client clnt in this.Doc.Clients)
+            {
+                clientIdx++;
+
+                foreach (SrvIO io in clnt.IO)
+                {
+                    TimeSpan ds = (io.Started - this.Metrics.ScaleStart);
+                    TimeSpan df = (io.Completed - this.Metrics.ScaleStart);
+                    double xStart = ds.TotalSeconds;
+                    double xFinish = df.TotalSeconds;
+                    float x1 = this.Metrics.SecondsToX((float)xStart);
+                    float x2 = this.Metrics.SecondsToX((float)xFinish);
+
+                    scp.SetVariable("callTimeStartX", DrawingMetrics.FmtFloat(x1));
+                    scp.SetVariable("callTimeFinishX", DrawingMetrics.FmtFloat(x2));
+                    scp.SetVariable("callWidthX", DrawingMetrics.FmtFloat(x2 - x1));
+                    scp.SetVariable("callTimeY", clientLineY);
+
+                    scp.AddItem(null, null);
+                }
+
+                clientLineY += this.Metrics.ClientLineHeight;
+            }
+            scp.AddFooter();
+            string btoCallsCode = scp.Finish();
+            this.Generator.AddItem(btoCallsCode, null);
+
+            // ----- add transactions
+
+            Trace.WriteLine(string.Format(" + adding transactions..."));
+            scp.Start("Transactions");
+            scp.AddHeader();
+            clientLineY = 60;
+            clientIdx = 0;
+            foreach (Client clnt in this.Doc.Clients)
+            {
+                clientIdx++;
+
+                foreach (TxScope tx in clnt.Transactions)
+                {
+                    TimeSpan ds = (tx.Started - this.Metrics.ScaleStart);
+                    TimeSpan df = (tx.Completed - this.Metrics.ScaleStart);
+                    double xStart = ds.TotalSeconds;
+                    double xFinish = df.TotalSeconds;
+                    float x1 = this.Metrics.SecondsToX((float)xStart);
+                    float x2 = this.Metrics.SecondsToX((float)xFinish);
+
+                    scp.SetVariable("txTimeStartX", DrawingMetrics.FmtFloat(x1));
+                    scp.SetVariable("txTimeFinishX", DrawingMetrics.FmtFloat(x2));
+                    scp.SetVariable("txWidthX", DrawingMetrics.FmtFloat(x2 - x1));
+                    scp.SetVariable("txTimeY", clientLineY);
+                    scp.SetVariable("txState", (tx.IsOpened ? "WIP" : (tx.IsCommitted ? "Committed" : "Aborted") ));                    
+
+                    scp.AddItem(null, null);
+                }
+
+                clientLineY += this.Metrics.ClientLineHeight;
+            }
+            scp.AddFooter();
+            string txCode = scp.Finish();
+            this.Generator.AddItem(txCode, null);
+
             // ----- close SVG
+
             Trace.WriteLine(string.Format(" + adding SVG footer..."));
             this.Generator.AddFooter();
             Trace.WriteLine(string.Format(" + generating SVG..."));

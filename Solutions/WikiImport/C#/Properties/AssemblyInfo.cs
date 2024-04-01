@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Wiki.Import tool")]
-[assembly: AssemblyDescription("Tool for importing MediaWiki XML backup")]
+[assembly: AssemblyDescription("Tool for importing content fromn MediaWiki to files (XML backup file, images, etc.)")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Dmitry Bond. Inc.")]
 [assembly: AssemblyProduct("con1")]
@@ -32,6 +32,6 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("2024.02.23.1227")]
+[assembly: AssemblyVersion("1.0.0.1")]
+[assembly: AssemblyFileVersion("2024.02.29.2007")]
 

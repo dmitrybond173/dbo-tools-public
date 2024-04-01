@@ -1,0 +1,21 @@
+D:\...ox\dbo-utils\trunk\dbo-utils\libs\.NET\XService\Net2>start .
+
+D:\...s\trunk\dbo-utils\libs\.NET\XService\Net2\Properties>svn up --set-depth=empty
+Updating '.':
+At revision 2635.
+
+D:\...s\trunk\dbo-utils\libs\.NET\XService\Net2\Properties>svn up --set-depth=infinity
+Updating '.':
+At revision 2635.
+
+D:\...s\trunk\dbo-utils\libs\.NET\XService\Net2\Properties>svn commit -m .
+svn: E205005: The log message is a pathname (was -F intended?); use '--force-log' to override
+
+D:\...s\trunk\dbo-utils\libs\.NET\XService\Net2\Properties>svn commit -m xxx
+Sending        AssemblyInfo.cs
+Transmitting file data .svn: E200014: Commit failed (details follow):
+svn: E200014: While preparing 'D:\sandbox\dbo-utils\trunk\dbo-utils\libs\.NET\XService\Net2\Properties\AssemblyInfo.cs'
+for commit
+svn: E200014: Base checksum mismatch on '/trunk/dbo-utils/libs/.NET/XService/Net2/Properties/AssemblyInfo.cs':
+   expected:  049a8cf8f2a7e0067833e588a9c11bac
+     actual:  b8277d19fc6a6b73dd4deb1e7dc72866

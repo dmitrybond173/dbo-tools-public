@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <!-- <icon>icon.png</icon> -->
+    <projectUrl>http://xservice.libs.localhost/</projectUrl>
+    <description>$description$</description>
+    <releaseNotes>Just a 1st official release</releaseNotes>
+    <copyright>$copyright$</copyright>
+    <readme>docs\readme.md</readme>
+    <tags>UI routinues smallapps</tags>
+  </metadata>
+  <files>
+    <file src="docs\readme.md" target="docs\" />
+    <file src="bin\release\XService.UI.pdb" target="lib\net20" />
+    <file src="bin\release\XService.UI.XML" target="lib\net20" />
+  </files>
+</package>

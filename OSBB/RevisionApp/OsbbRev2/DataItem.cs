@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace OsbbRev2
@@ -29,10 +30,13 @@ namespace OsbbRev2
             return result;
         }
 
-        public DataItem() { }
+        public DataItem() { this.Categories = new List<CategoryDescriptor>(); }
 
         public DataItem(DataItem pSrc) 
         {
+            this.Categories = new List<CategoryDescriptor>();
+            this.Categories.AddRange(pSrc.Categories);
+
             this.Row = pSrc.Row;
             this.RowIndex = pSrc.RowIndex;
 
@@ -108,5 +112,6 @@ namespace OsbbRev2
         public Excel.Range Row { get; set; }
 
         public CategoryDescriptor Category { get; set; }
+        public List<CategoryDescriptor> Categories { get; set; }
     }
 }

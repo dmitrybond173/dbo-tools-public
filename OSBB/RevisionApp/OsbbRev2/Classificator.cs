@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.Threading;
+using System.Web;
 using System.Xml;
 using XService.Utils;
 using Excel = Microsoft.Office.Interop.Excel;
@@ -54,6 +55,8 @@ namespace OsbbRev2
             if (cnt == 0)
                 tmpList.Add(this.DefaultCategory);
 
+            pItem.Categories.AddRange(tmpList);
+
             foreach (CategoryDescriptor cd in tmpList)
             {
                 DataItem item = new DataItem(pItem) { Category = cd };
@@ -91,13 +94,17 @@ namespace OsbbRev2
             pSheet.Cells[iRow, iCol + 4].Value = "Category";
             iRow += 2;
 
+            int idx = 0;
+            string categoryName = "";
             List<DataItem> defList = null;
             foreach (KeyValuePair<CategoryDescriptor, List<DataItem>> kvp in this.Data)
             {
-                Trace.WriteLine(string.Format(" -- Category[{0}]: {1} items...", kvp.Key.Caption, kvp.Value.Count));
-
+                idx++;
                 CategoryDescriptor cd = kvp.Key;
                 List<DataItem> list = kvp.Value;
+
+                categoryName = string.Format("#{0} - {1}", idx, cd.Caption);
+                Trace.WriteLine(string.Format(" -- Category[{0}]: {1} items...", categoryName, kvp.Value.Count));
 
                 if (this.DefaultCategory == cd)
                 {
@@ -105,39 +112,55 @@ namespace OsbbRev2
                     continue;
                 }
 
-                flushCategory(ref iRow, iCol, cd, list, pSheet);
+                flushCategory(ref iRow, iCol, cd, list, pSheet, categoryName);
 
                 if (HasFlag(EFlags.AddDetalisation))
-                    PostDataItems(iCol + 3, ref iRow, list, pSheet);
+                    PostDataItems(iCol + 6, ref iRow, list, pSheet, categoryName);
+
+                iRow += 1;
             }
 
             if (defList != null)
             {
-                flushCategory(ref iRow, iCol, this.DefaultCategory, defList, pSheet);
+                flushCategory(ref iRow, iCol, this.DefaultCategory, defList, pSheet, categoryName);
 
-                PostDataItems(iCol + 3, ref iRow, defList, pSheet);
+                if (HasFlag(EFlags.AddDetalisation))
+                    PostDataItems(iCol + 6, ref iRow, defList, pSheet, categoryName);
             }
         }
 
-        public void PostDataItems(int iCol, ref int iRow, List<DataItem> pList, Excel.Worksheet pSheet)
+        public void PostDataItems(int iCol, ref int iRow, List<DataItem> pList, Excel.Worksheet pSheet, string pCategory)
         {
-            pSheet.Cells[iRow, iCol].Value = "Acc#";
-            pSheet.Cells[iRow, iCol + 1].Value = "Time";
-            pSheet.Cells[iRow, iCol + 2].Value = "Money";
-            pSheet.Cells[iRow, iCol + 3].Value = "Descr";
-            pSheet.Cells[iRow, iCol + 4].Value = "CounterParty";
+            Trace.WriteLine(string.Format("  ++ PostDataItems( R{0}/C{1}; {2} items; category={3} ... )", iRow, iCol, pList.Count, pCategory));
+
+            pSheet.Cells[iRow, iCol + 0].Value = "row#";
+            pSheet.Cells[iRow, iCol + 0].Value = "refs.";
+            pSheet.Cells[iRow, iCol + 1].Value = "Acc#";
+            pSheet.Cells[iRow, iCol + 2].Value = "Time";
+            pSheet.Cells[iRow, iCol + 3].Value = "Money";
+            pSheet.Cells[iRow, iCol + 4].Value = "Descr";
+            pSheet.Cells[iRow, iCol + 5].Value = "CounterParty";
             iRow++;
+            int idx = -1;
             foreach (DataItem it in pList)
             {
-                pSheet.Cells[iRow, iCol].Value = "\'" + it.AccountNo.ToString("0###");
-                pSheet.Cells[iRow, iCol + 1].Value = it.Time;
-                pSheet.Cells[iRow, iCol + 2].Value = it.Money;
-                pSheet.Cells[iRow, iCol + 3].Value = it.Description;
-                pSheet.Cells[iRow, iCol + 4].Value = it.CounterParty;
+                idx++;
+                if (idx > 0 && (idx % 100) == 0)
+                    Trace.WriteLine(string.Format("  = item# {0}...", idx));
+
+                pSheet.Cells[iRow, iCol + 0].Value = "#" + it.RowIndex.ToString("0###");
+                pSheet.Cells[iRow, iCol + 1].Value = "\'" + it.AccountNo.ToString("0###");
+                pSheet.Cells[iRow, iCol + 2].Value = "\'" + it.Categories.Count.ToString();
+                pSheet.Cells[iRow, iCol + 3].Value = it.Time;
+                pSheet.Cells[iRow, iCol + 4].Value = it.Money;
+                pSheet.Cells[iRow, iCol + 5].Value = it.Description;
+                pSheet.Cells[iRow, iCol + 6].Value = it.CounterParty;
                 iRow++;
 
                 Thread.Sleep(1);
             }
+
+            Trace.WriteLine(string.Format("   = PostDataItems: done. R{0}/C{1}", iRow, iCol));
         }
 
         public int Match(DataItem pItem, List<CategoryDescriptor> pTargetList)
@@ -147,7 +170,9 @@ namespace OsbbRev2
             {
                 if (c.Patterns.Count == 0) continue; // here we need to handle only categories with patterns!
                 if (c.IsMatch(pItem))
+                {
                     pTargetList.Add(c);
+                }
             }
             return pTargetList.Count - savedCnt;
         }
@@ -191,13 +216,22 @@ namespace OsbbRev2
             }
         }
 
-        private void flushCategory(ref int iRow, int iCol, CategoryDescriptor cd, List<DataItem> list, Excel.Worksheet pSheet)
+        private void flushCategory(ref int iRow, int iCol, CategoryDescriptor cd, List<DataItem> list, Excel.Worksheet pSheet, string pCategory)
         {
+            Trace.WriteLine(string.Format("  ++ flushCategory( R{0}/C{1}; {2} items; category={3} ... )", iRow, iCol, list.Count, pCategory));
+
+            iRow += 1;
+
             float sum = 0;
             float totalIn = 0;
             float totalOut = 0;
+            int idx = -1;
             foreach (DataItem item in list)
             {
+                idx++;
+                if (idx > 0 && (idx % 100) == 0)
+                    Trace.WriteLine(string.Format("  = item# {0}...", idx));
+
                 sum += item.Money;
                 if (item.Money > 0) totalIn += item.Money;
                 if (item.Money < 0) totalOut += item.Money;
@@ -211,6 +245,8 @@ namespace OsbbRev2
             pSheet.Cells[iRow, iCol + 4].Value = cd.Caption;
 
             iRow += 2;
+
+            Trace.WriteLine(string.Format("   = flushCategory: done. total=[in:{0}; out:{1}]", totalIn, totalOut));
         }
 
         private List<CategoryDescriptor> tmpList = new List<CategoryDescriptor>();

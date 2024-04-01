@@ -67,10 +67,26 @@
       writing-mode: tb;
       text-anchor: end;
     }
-
-    .txAxis {
+    
+    .btoCallFrame {
+      fill: none;
       stroke: blue; 
-      stroke-width: 0.5;
+      stroke-width: 0.7;
+    }
+    
+    .txFrame {
+      fill: none;
+      stroke: orange; 
+      stroke-width: 1.5;
+    }
+    .txFrameWIP {
+      stroke: orange; 
+    }
+    .txFrameCommitted {
+      stroke: green; 
+    }
+    .txFrameAborted {
+      stroke: red; 
     }
   </style>
 
@@ -233,6 +249,48 @@
 
     <Footer><![CDATA[
   <!-- SessionInitWaits: End -->    
+    ]]>
+    </Footer>
+
+  </Template>
+
+  <!-- ***** [BtoCalls] ****************************************************************** -->
+
+  <Template name="BtoCalls">
+
+    <Header><![CDATA[
+  <!-- BtoCalls: Begin -->
+    ]]></Header>
+
+    <Item><![CDATA[
+      <path d="M $(callTimeStartX),$(callTimeY) m 0,-5 l 0,-5 l $(callWidthX),0 l 0,18" class="btoCallFrame" />
+      
+    ]]></Item>
+
+    <Footer><![CDATA[
+  <!-- BtoCalls: End -->    
+    ]]>
+    </Footer>
+
+  </Template>
+
+  <!-- ***** [Transactions] ****************************************************************** -->
+
+  <Template name="Transactions">
+
+    <Header><![CDATA[
+  <!-- Transactions: Begin -->
+    ]]>
+    </Header>
+
+    <Item><![CDATA[
+      <path d="M $(txTimeStartX),$(txTimeY) m 0,6 l 0,3 l $(txWidthX),0 l 0,-3" class="txFrame txFrame$(txState)" />
+      
+    ]]>
+    </Item>
+
+    <Footer><![CDATA[
+  <!-- Transactions: End -->    
     ]]>
     </Footer>
 

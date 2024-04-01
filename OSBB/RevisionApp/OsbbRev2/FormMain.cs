@@ -63,7 +63,12 @@ namespace OsbbRev2
             DateTime t1 = DateTime.Now;
             setStatus("Loading...", pFilename);
             this.wBook = this.app.Workbooks.Open(pFilename);
-            setStatus("Ready.", string.Format("{0} sec", (DateTime.Now - t1).TotalSeconds.ToString("N1")));
+            DateTime t2 = DateTime.Now;
+            setStatus("Ready.", string.Format("[{0} .. {1}]{2} sec", 
+                StrUtils.CompactNskTimestampOf(t1).Substring(0, 15),
+                StrUtils.CompactNskTimestampOf(t2).Substring(0, 15),
+                (t2 - t1).TotalSeconds.ToString("N1"))
+                );
             setCaption(string.Format("{0} @ {1}", Path.GetFileName(pFilename), Path.GetDirectoryName(pFilename)));
         }
 
@@ -184,7 +189,12 @@ namespace OsbbRev2
 
             app.Visible = true;
 
-            setStatus("Ready.", string.Format("{0} rows, dT={1} sec", iRow, (t2-t1).TotalSeconds.ToString("N1")));
+            setStatus("Ready.", string.Format("{0} rows, dT[{1}..{2}]={3} sec", 
+                iRow, 
+                StrUtils.CompactNskTimestampOf(t1).Substring(0, 15),
+                StrUtils.CompactNskTimestampOf(t2).Substring(0, 15),
+                (t2 - t1).TotalSeconds.ToString("N1")) 
+                );
         }
 
         #region Update UI

@@ -21,6 +21,9 @@ using XService.Utils;
 
 namespace Plugin.CslmonClientsAndSessions
 {
+    /// <summary>
+    /// Root point of all data holders related for processing ClientAndSessions log facts
+    /// </summary>
     public class Document
     {
         public Document() 
@@ -63,6 +66,9 @@ namespace Plugin.CslmonClientsAndSessions
             this.Clients.Clear();
         }
 
+        /// <summary>
+        /// Parse log facts data and rebuild list of: CSL clients, executor sessions, BTO server calls, transactions, etc
+        /// </summary>
         public void Load(DbDataReader dr, DbConnection db)
         { 
             while (dr.Read()) 
@@ -70,6 +76,8 @@ namespace Plugin.CslmonClientsAndSessions
                 string ts = dr["LogTime"].ToString();
                 string ep = dr["ClientEP"].ToString();
                 string tid = dr["TID"].ToString();
+                string action = dr["action"].ToString();
+                int lineNo = (int)dr["lineno"];
 
                 //DBG: if (tid != "1384") continue;
                 //DBG: if (tid != "1D90") continue;
@@ -139,23 +147,46 @@ namespace Plugin.CslmonClientsAndSessions
                                 io.DeltaTime = (int)dr["dT"];
                             }
                         }
+                        // ----- TX
+                        if (StrUtils.IsSameText(ft, "TX"))
+                        {
+                            PluginUtils.Assert(StrUtils.IsSameText(ep, cli.EP), string.Format("Client EP is not match: {0} but expected {1}", ep, cli.EP));
+
+                            if (StrUtils.IsSameText(action, "BGN"))
+                            {
+                                TxScope tx = new TxScope() { Owner = cli };
+                                tx.Lines.Add(lineNo);
+                                tx.ClientEP = ep;
+                                tx.Started = StrUtils.NskTimestampToDateTime(ts);
+                                tx.SeqStart = (int)dr["seq"];
+                                cli.Transactions.Add(tx);
+                            }
+                            else
+                            {
+                                TxScope tx = cli.LastTx;
+                                PluginUtils.Assert(StrUtils.IsSameText(ep, tx.ClientEP), string.Format("TX Client EP is not match: {0} but expected {1}", ep, tx.ClientEP));
+                                tx.Lines.Add(lineNo);
+                                tx.Completed = StrUtils.NskTimestampToDateTime(ts);
+                                tx.SeqFinish = (int)dr["seq"];
+                                tx.IsCommitted = StrUtils.IsSameText(action, "COM");
+                            }
+                        }
                         // ----- Sessions
                         else if (StrUtils.IsSameText(ft, "NewSession"))
                         {
                             PluginUtils.Assert(StrUtils.IsSameText(ep, cli.EP), string.Format("Client EP is not match: {0} but expected {1}", ep, cli.EP));
 
-                            if (tid == "1D90")
-                                tid += "";
+                            //DBG: if (tid == "1D90") tid += "";
 
                             Session sess = new Session() { Owner = cli };
-                            sess.Lines.Add((int)dr["lineno"]);
+                            sess.Lines.Add(lineNo);
                             sess.TryToAllocate = StrUtils.NskTimestampToDateTime(ts);
                             cli.Sessions.Add(sess);
                         }
                         else if (StrUtils.IsSameText(ft, "SessionPid"))
                         {
                             Session sess = cli.LastSession;
-                            sess.Lines.Add((int)dr["lineno"]);
+                            sess.Lines.Add(lineNo);
                             sess.IsNew = true;
                             sess.ExecID = dr["execId"].ToString();
                             sess.WaitingForPipe = StrUtils.NskTimestampToDateTime(ts);
@@ -163,7 +194,7 @@ namespace Plugin.CslmonClientsAndSessions
                         else if (StrUtils.IsSameText(ft, "PipeConnected"))
                         {
                             Session sess = cli.LastSession;
-                            sess.Lines.Add((int)dr["lineno"]);
+                            sess.Lines.Add(lineNo);
                             sess.IsNew = true;
                             sess.Allocated = StrUtils.NskTimestampToDateTime(ts);
                             sess.ExecID = dr["execId"].ToString();
@@ -171,14 +202,14 @@ namespace Plugin.CslmonClientsAndSessions
                         else if (StrUtils.IsSameText(ft, "SessionToClient"))
                         {
                             Session sess = cli.LastSession;
-                            sess.Lines.Add((int)dr["lineno"]);
+                            sess.Lines.Add(lineNo);
                             sess.ExecID = dr["execId"].ToString();
                             sess.Allocated = StrUtils.NskTimestampToDateTime(ts);
                         }
                         else if (StrUtils.IsSameText(ft, "SessionReleased"))
                         {
                             Session sess = cli.LastSession;
-                            sess.Lines.Add((int)dr["lineno"]);
+                            sess.Lines.Add(lineNo);
                             sess.Released = StrUtils.NskTimestampToDateTime(ts);
                         }
                     }
@@ -261,6 +292,9 @@ namespace Plugin.CslmonClientsAndSessions
     }
 
 
+    /// <summary>
+    /// Holder of CSL client properties rebuilt from log facts
+    /// </summary>
     public class Client
     { 
         public Client() 
@@ -271,6 +305,7 @@ namespace Plugin.CslmonClientsAndSessions
 
             this.IO = new List<SrvIO>();
             this.Sessions = new List<Session>();
+            this.Transactions = new List<TxScope>();
         }
 
         public override string ToString()
@@ -301,6 +336,9 @@ namespace Plugin.CslmonClientsAndSessions
         public SrvIO LastIO { get { return this.IO[this.IO.Count - 1]; } }
         public Session LastSession { get { return this.Sessions[this.Sessions.Count - 1]; } }
 
+        public List<TxScope> Transactions {  get; protected set; }
+        public TxScope LastTx { get { return this.Transactions[this.Transactions.Count - 1]; } }
+
         public string FirstSessionInitTs
         {
             get             
@@ -320,6 +358,9 @@ namespace Plugin.CslmonClientsAndSessions
     }
 
 
+    /// <summary>
+    /// Holder of CSLMON executor session properties rebuilt from log facts
+    /// </summary>
     public class Session
     {
         public Session()
@@ -351,6 +392,9 @@ namespace Plugin.CslmonClientsAndSessions
     }
 
 
+    /// <summary>
+    /// Holder of BTO call properties rebuilt from log facts
+    /// </summary>
     public class SrvIO
     {
         public SrvIO()
@@ -375,6 +419,42 @@ namespace Plugin.CslmonClientsAndSessions
         public string SrvClass { get; set; } = null;
         public int SeqNo { get; set; } = -1;
         public int DeltaTime { get; set; } = 0;
+    }
+
+
+    /// <summary>
+    /// Holder of BTO transaction properties rebuilt from log facts
+    /// </summary>
+    public class TxScope
+    {
+        public TxScope()
+        {
+        }
+
+        public override string ToString()
+        {
+            return String.Format("TxScope[#{0}; {1}..{2}; {3} .. {4}]",
+                (this.IsOpened ? "in-progress" : (this.IsCommitted ? "commited" : "aborted")),
+                this.SeqStart, this.SeqFinish,
+                StrUtils.NskTimestampOf(this.Started).Substring(0, 19),
+                StrUtils.NskTimestampOf(this.Completed).Substring(0, 19)                
+                );
+        }
+
+        public Client Owner;
+        public List<int> Lines = new List<int>();
+
+        public bool IsOpened 
+        {
+            get { return (this.Started != DateTime.MinValue && this.Completed == DateTime.MinValue); }
+        }
+
+        public string ClientEP = null;
+        public DateTime Started { get; set; } = DateTime.MinValue;
+        public DateTime Completed { get; set; } = DateTime.MinValue;
+        public bool IsCommitted { get; set; } = false;
+        public int SeqStart { get; set; } = -1;
+        public int SeqFinish { get; set; } = -1;
     }
 
 

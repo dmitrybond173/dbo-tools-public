@@ -69,22 +69,28 @@ namespace Wiki.Import
 
         private void execute()
         {
-
-            foreach (TraceListener lsnr in Trace.Listeners)
-                Console.WriteLine("{0}: {1}", lsnr.Name, lsnr.GetType());
-
-            Trace.WriteLine("Importing wiki...");
-
             //string fn = "C:/sbx/dbo-tools-public/Solutions/WikiImport/My+Wiki-sm.xml"; // small piece of wiki for debug purposes
-            WikiFile file = new WikiFile(this.settings.SourceFile.FullName);
-            file.Parse();
+            this.wikiFile = new WikiFile(this.settings.SourceFile.FullName);
+            this.wikiFile.Parse();
+
+            switch (this.settings.Action)
+            {
+                case ToolSettings.EAction.Import: executeWikiImport(); break;
+                case ToolSettings.EAction.ExportFiles: executeWikiFilesExport(); break;
+                case ToolSettings.EAction.ImportFiles: executeWikiFilesImport(); break;
+            }
+        }
+
+        private void executeWikiImport()
+        {
+            Trace.WriteLine("Importing wiki text (from XML backup file to wiki site)...");
 
             int idx = 0;
             long sumSize = 0;
             int maxLen = 0;
             int fileCnt = 0;
             Dictionary<int, int> sizeStat = new Dictionary<int, int>();
-            foreach (WikiFile.Page pg in file.Pages)
+            foreach (WikiFile.Page pg in this.wikiFile.Pages)
             {
                 pg.Index = idx;
                 idx++;
@@ -103,7 +109,7 @@ namespace Wiki.Import
                     cnt = 0;
                 sizeStat[szKb] = cnt + 1;
             }
-            long avgSize = sumSize / file.Pages.Count;
+            long avgSize = sumSize / this.wikiFile.Pages.Count;
             Trace.WriteLine("--- Some statistic ---");
             string info = string.Format(
                 "{1} notes in total{0}" +
@@ -113,7 +119,7 @@ namespace Wiki.Import
                 "{5} file:* records{0}" +
                 "{6} sizes in statistic:",
                 "\n",
-                file.Pages.Count, maxLen, avgSize, sumSize, fileCnt, sizeStat.Count);
+                this.wikiFile.Pages.Count, maxLen, avgSize, sumSize, fileCnt, sizeStat.Count);
             string[] lines = info.Split('\n');
             foreach (string line in lines) Trace.WriteLine(line);
             List<KeyValuePair<int, int>> szRefs = new List<KeyValuePair<int, int>>();
@@ -141,17 +147,13 @@ namespace Wiki.Import
             if (this.settings.WikiUser != null)
                 saver.LoginToWiki(this.settings.WikiUser, this.settings.WikiPassword);
 
-            foreach (WikiFile.Page pg in file.Pages)
+            foreach (WikiFile.Page pg in this.wikiFile.Pages)
             {
                 string id = pg.Title;
-                if (this.settings.ExcludePages != null && this.settings.ExcludePages.Contains(id.ToLower()))
+                string reason;
+                if (!isOkToProceed(id.ToLower(), out reason))
                 {
-                    Trace.WriteLine(string.Format("--- Exclude page: {0}", pg.Title));
-                    continue;
-                }
-                if (this.settings.IncludePages != null && !this.settings.IncludePages.Contains(id.ToLower()))
-                {
-                    Trace.WriteLine(string.Format("--- Page is not included: {0}", pg.Title));
+                    Trace.WriteLine(string.Format("--- {0}: {1}", reason, pg.Title));
                     continue;
                 }
 
@@ -162,7 +164,136 @@ namespace Wiki.Import
             }
         }
 
+        private void executeWikiFilesImport()
+        {
+            Trace.WriteLine("Importing image files (from disk to wiki site)...");
+
+            WikiBrowser saver = new WikiBrowser(this.settings);
+
+            if (this.settings.WikiUser != null)
+                saver.LoginToWiki(this.settings.WikiUser, this.settings.WikiPassword);
+
+            int idx = 0;
+            int fileCnt = 0;
+            Dictionary<int, int> sizeStat = new Dictionary<int, int>();
+            foreach (WikiFile.Page pg in this.wikiFile.Pages)
+            {
+                pg.Index = idx;
+                idx++;
+
+                if (!pg.Title.ToLower().StartsWith("file:")) continue;
+
+                string id = pg.Title;
+                string reason;
+                if (!isOkToProceed(id.ToLower(), out reason))
+                {
+                    Trace.WriteLine(string.Format("--- {0}: {1}", reason, pg.Title));
+                    continue;
+                }
+
+            }
+
+        }
+
+        private void executeWikiFilesExport()
+        {
+            Trace.WriteLine("Exporting image files (from wiki site to disk)...");
+
+            WikiBrowser saver = new WikiBrowser(this.settings);
+
+            if (this.settings.WikiUser != null)
+                saver.LoginToWiki(this.settings.WikiUser, this.settings.WikiPassword);
+
+            string ts = StrUtils.CompactNskTimestampOf(DateTime.Now).Substring(0, 8 + 1 + 4);
+            DirectoryInfo dir = new DirectoryInfo("pics_" + ts);
+            if (!dir.Exists)
+            {
+                Trace.WriteLine(string.Format("+++ Creating dir: [{0}]", dir.FullName));
+                dir.Create();
+            }
+
+            DateTime t1 = DateTime.Now;
+            int idx = 0;
+            int okCnt = 0, failCnt = 0, skipCnt = 0;
+            Dictionary<int, int> sizeStat = new Dictionary<int, int>();
+            foreach (WikiFile.Page pg in this.wikiFile.Pages)
+            {
+                pg.Index = idx;
+                idx++;
+
+                if (!pg.Title.ToLower().StartsWith("file:")) continue;
+
+                string id = pg.Title;
+                string fn = StrUtils.GetAfterPattern(id, ":");
+                string reason;
+                if (!isOkToProceed(id.ToLower(), out reason))
+                {
+                    skipCnt++;
+                    Trace.WriteLine(string.Format("--- {0}: {1}", reason, pg.Title));
+                    continue;
+                }
+
+                string fileUrl;
+                if (!saver.OpenWikiFilePage(pg, out fileUrl))
+                {
+                    failCnt++;
+                    Trace.WriteLine(string.Format("--- FAIL: cannot determine file url: {0}", pg.Title));
+                    saveFileRefFailure(dir, pg, "Fail to determine file url");
+                    continue;
+                }
+
+                byte[] data;
+                if (!saver.DownloadByApiCall(fileUrl, out data))
+                {
+                    failCnt++;
+                    Trace.WriteLine(string.Format("--- FAIL: cannot download file: {0}", pg.Title));
+                    saveFileRefFailure(dir, pg, "Fail to download");
+                    continue;
+                }
+
+                FileInfo fi = new FileInfo(PathUtils.IncludeTrailingSlash(dir.FullName) + fn);
+                Trace.WriteLine(string.Format(" + Saving {0} bytes to file: {1} => {2}", data.Length, fn, fi.FullName));
+                using (FileStream fs = fi.Create()) 
+                {
+                    fs.Write(data, 0, data.Length);
+                }
+                fi.Refresh();
+                Trace.WriteLine(string.Format("   = Saved. {0} bytes", fi.Length));
+                okCnt++;
+            }
+            Trace.WriteLine(string.Format("=== SUMMARY: {0} files exported. Skip {1} files. Fail to export {2} files. Elapsed time = {3} sec", 
+                okCnt, skipCnt, failCnt, (DateTime.Now - t1).TotalSeconds.ToString("N1") ));
+        }
+
+        private void saveFileRefFailure(DirectoryInfo pDir, WikiFile.Page pPage, string pReason)
+        {
+            Trace.WriteLine(string.Format(" -+ Add to failures-list: [{0}] -> {1}", pPage.Title, pReason));
+            using (StreamWriter sw = File.AppendText(PathUtils.IncludeTrailingSlash(pDir.FullName) + "failuresList.txt"))
+            {
+                string info = string.Format("{0}     <== {1}", pPage.Title, pReason);
+                sw.WriteLine(info);
+            }
+        }
+
+        private bool isOkToProceed(string id, out string pReason)
+        {
+            pReason = null;
+            if (this.settings.ExcludePages != null && this.settings.ExcludePages.Contains(id.ToLower()))
+            {
+                pReason = "page excluded";
+                return false;
+            }
+            if (this.settings.IncludePages != null && !this.settings.IncludePages.Contains(id.ToLower()))
+            {
+                pReason = "page is not included";
+                return false;
+            }
+            return true;
+        }
+
+
         protected ToolSettings settings = new ToolSettings();
+        protected WikiFile wikiFile = null;
     }
 
 }
