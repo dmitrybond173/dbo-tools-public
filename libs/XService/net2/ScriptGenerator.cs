@@ -355,7 +355,7 @@ namespace XService.Components
                 if (!minSpcLen.HasValue || (minSpcLen.HasValue && spcLen < minSpcLen))
                     minSpcLen = spcLen;
             }
-            if (minSpcLen.HasValue)
+            if (minSpcLen.HasValue && minSpcLen > 0)
             {
                 for (int i = 0; i < lines.Length; i++)
                 {

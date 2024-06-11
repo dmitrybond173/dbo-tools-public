@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("XService Library for .NET 2.0+")]
 [assembly: AssemblyDescription("Simple extensions for .NET platform. Written by Dmitry Bond. (dima_ben@ukr.net)")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("DmitryBond. Inc.")]
-[assembly: AssemblyProduct("dbo-tools")]
-[assembly: AssemblyCopyright("Copyright © DmitryBond. Inc. 2006-2024")]
+[assembly: AssemblyCompany("Dmitry Bond. Inc.")]
+[assembly: AssemblyProduct("")]
+[assembly: AssemblyCopyright("Copyright © Dmitry Bond. Inc. 2006-2024")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -31,6 +31,6 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:
-[assembly: AssemblyVersion("1.0.13.229")]
-[assembly: AssemblyFileVersion("2024.03.25.1537")]
-[assembly: AssemblyInformationalVersion("2024.03.25.1537")]
+[assembly: AssemblyVersion("1.0.13.230")]
+[assembly: AssemblyFileVersion("2024.06.11.1250")]
+[assembly: AssemblyInformationalVersion("2024.06.10.2345")]

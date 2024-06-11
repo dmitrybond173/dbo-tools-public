@@ -91,6 +91,7 @@
     <Compile Include="InteractiveShellHandler.cs" />
     <Compile Include="LicenseKey.cs" />
     <Compile Include="MimePackage.cs" />
+    <Compile Include="Parsers.cs" />
     <Compile Include="PasswordService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ObjectRefCounter.cs" />
