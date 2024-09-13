@@ -12,14 +12,14 @@ To run this tool you need following:
 
 ## Setup Instructions
 
-# run `npm pack`, it will build `srvclstnjs-nnnn.n.nnnnnn.tgz` (where n is digit reflecting version#)
-# extract to `C:\inetpub\wwwroot\SrvcLstNjs\` or other location you want to use for it
-# switch to location where you extracted it, run `npm install` to download all required packages
-# create `logs` sub-directory
-# check configuration parameters in `config/*.json` - if you are ok with it?
-# ensure NSSM.exe tool is available, run `setNssmSrvc.cmd`
-# start `SrvcLstNjs` service (you can use `restart.cmd`)
-# start browser try to open url like `http://localhost:1001` (or other port# - depending on what specified in `config/*.json`)
+1. run `npm pack`, it will build `srvclstnjs-nnnn.n.nnnnnn.tgz` (where n is digit reflecting version#)
+2. extract to `C:\inetpub\wwwroot\SrvcLstNjs\` or other location you want to use for it
+3. switch to location where you extracted it, run `npm install` to download all required packages
+4. create `logs` sub-directory
+5. check configuration parameters in `config/*.json` - if you are ok with it?
+6. ensure NSSM.exe tool is available, run `setNssmSrvc.cmd`
+7. start `SrvcLstNjs` service (you can use `restart.cmd`)
+8. start browser try to open url like `http://localhost:1001` (or other port# - depending on what specified in `config/*.json`)
 
 ## Configuration
 
