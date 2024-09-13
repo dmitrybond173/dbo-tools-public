@@ -1,0 +1,25 @@
+{
+  "name": "srvclstnjs",
+  "version": "2024.9.131113",
+  "description": "services list",
+  "type": "module",
+  "main": "SrvcLstNjs.js",
+  "scripts": {
+    "start:dev": "nodemon SrvcLstNjs.js"
+  },
+  "author": "dmitry bond.",
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^22.5.1",
+    "axios": "^1.7.6",
+    "config": "^3.3.12",
+    "date-fns": "^3.6.0",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "is-elevated": "^4.0.0",
+    "njs": "^0.0.2",
+    "nodemon": "^3.1.4",
+    "react": "^18.3.1",
+    "wildcard-match": "^5.1.3"
+  }
+}
