@@ -140,6 +140,7 @@ namespace OsbbRev2
             pSheet.Cells[iRow, iCol + 3].Value = "Money";
             pSheet.Cells[iRow, iCol + 4].Value = "Descr";
             pSheet.Cells[iRow, iCol + 5].Value = "CounterParty";
+            pSheet.Cells[iRow, iCol + 7].Value = "Categories...";
             iRow++;
             int idx = -1;
             foreach (DataItem it in pList)

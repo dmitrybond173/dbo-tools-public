@@ -1,0 +1,1 @@
+copy /v /y C:\Users\Dmitr\Dropbox\kvartira\revision-2021-2023\richtown-revision-2021-2023-ok1.xlsx .

@@ -70,6 +70,8 @@ namespace OsbbRev2
                 (t2 - t1).TotalSeconds.ToString("N1"))
                 );
             setCaption(string.Format("{0} @ {1}", Path.GetFileName(pFilename), Path.GetDirectoryName(pFilename)));
+
+            btnAnalyze.Enabled = true;
         }
 
         private bool preAnalysisCheck(out string pErrMsg)
@@ -160,17 +162,21 @@ namespace OsbbRev2
                         break;
                 }
 
-                if (vDescr != null)
+                bool isSkip = (StrUtils.IsSameText(vDescr, "xxx"));
+                if (!isSkip)
                 {
-                    isOpened = true;
-
-                    DataItem item = DataItem.Load(row, iRow);
-                    if (item != null)
+                    if (vDescr != null)
                     {
-                        classificator.Analyze(item, row, iRow);
+                        isOpened = true;
+
+                        DataItem item = DataItem.Load(row, iRow);
+                        if (item != null)
+                        {
+                            classificator.Analyze(item, row, iRow);
+                        }
+                        else
+                            Trace.WriteLine(string.Format("SKIP: fail to load data item from row#{0}", iRow));
                     }
-                    else
-                        Trace.WriteLine(string.Format("ERR: fail to load data item from row#{0}", iRow));
                 }
 
                 iRow++;
@@ -315,6 +321,14 @@ namespace OsbbRev2
             s = ConfigurationManager.AppSettings["WorksheetName"];
             if (!string.IsNullOrEmpty(s))
                 this.sourceWorksheetName = s;
+
+            s = ConfigurationManager.AppSettings["AppVisible"];
+            if (!string.IsNullOrEmpty(s))
+                this.chkAppVisible.Checked = StrUtils.GetAsBool(s);
+
+            s = ConfigurationManager.AppSettings["AddDetalization"];
+            if (!string.IsNullOrEmpty(s))
+                this.chkAddDetalization.Checked = StrUtils.GetAsBool(s);
         }
 
         private void FormMain_Shown(object sender, EventArgs e)
