@@ -10,10 +10,12 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Web;
 using System.Xml;
 using XService.Utils;
+using static XService.Utils.SyncUtils.LockInfo;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace OsbbRev2
@@ -36,6 +38,9 @@ namespace OsbbRev2
             None = 0,
             AddDetalisation = 0x0001,
         }
+
+        public delegate void UpdateStatusBarMethod(string pMsg);
+        public UpdateStatusBarMethod UpdateStatusBar;
 
         public List<CategoryDescriptor> Categories { get; protected set; }
         public Dictionary<CategoryDescriptor, List<DataItem>> Data { get; protected set; }
@@ -104,6 +109,7 @@ namespace OsbbRev2
                 List<DataItem> list = kvp.Value;
 
                 categoryName = string.Format("#{0} - {1}", idx, cd.Caption);
+                setStatus("+ category: " + categoryName);
                 Trace.WriteLine(string.Format(" -- Category[{0}]: {1} items...", categoryName, kvp.Value.Count));
 
                 if (this.DefaultCategory == cd)
@@ -115,7 +121,7 @@ namespace OsbbRev2
                 flushCategory(ref iRow, iCol, cd, list, pSheet, categoryName);
 
                 if (HasFlag(EFlags.AddDetalisation))
-                    PostDataItems(iCol + 6, ref iRow, list, pSheet, categoryName);
+                    PostDataItems(idx, iCol + 6, ref iRow, list, pSheet, categoryName);
 
                 iRow += 1;
             }
@@ -125,37 +131,40 @@ namespace OsbbRev2
                 flushCategory(ref iRow, iCol, this.DefaultCategory, defList, pSheet, categoryName);
 
                 if (HasFlag(EFlags.AddDetalisation))
-                    PostDataItems(iCol + 6, ref iRow, defList, pSheet, categoryName);
+                    PostDataItems(idx, iCol + 6, ref iRow, defList, pSheet, categoryName);
             }
         }
 
-        public void PostDataItems(int iCol, ref int iRow, List<DataItem> pList, Excel.Worksheet pSheet, string pCategory)
+        private static string[] colNames = new string[] { 
+            "row#", "refs.", "Acc#", "Time", "Money", "Descr", "CounterParty", "Categories..." 
+        };
+
+        public void PostDataItems(int pCategoryIdx, int iCol, ref int iRow, List<DataItem> pList, Excel.Worksheet pSheet, string pCategory)
         {
             Trace.WriteLine(string.Format("  ++ PostDataItems( R{0}/C{1}; {2} items; category={3} ... )", iRow, iCol, pList.Count, pCategory));
 
-            pSheet.Cells[iRow, iCol + 0].Value = "row#";
-            pSheet.Cells[iRow, iCol + 0].Value = "refs.";
-            pSheet.Cells[iRow, iCol + 1].Value = "Acc#";
-            pSheet.Cells[iRow, iCol + 2].Value = "Time";
-            pSheet.Cells[iRow, iCol + 3].Value = "Money";
-            pSheet.Cells[iRow, iCol + 4].Value = "Descr";
-            pSheet.Cells[iRow, iCol + 5].Value = "CounterParty";
-            pSheet.Cells[iRow, iCol + 7].Value = "Categories...";
+            PostCaptions(pSheet, iRow, iCol, colNames);
+
             iRow++;
             int idx = -1;
             foreach (DataItem it in pList)
             {
                 idx++;
                 if (idx > 0 && (idx % 100) == 0)
-                    Trace.WriteLine(string.Format("  = item# {0}...", idx));
+                    Trace.WriteLine(string.Format("  = item# {0}.{1}...", pCategoryIdx, idx));
 
                 pSheet.Cells[iRow, iCol + 0].Value = "#" + it.RowIndex.ToString("0###");
-                pSheet.Cells[iRow, iCol + 1].Value = "\'" + it.AccountNo.ToString("0###");
-                pSheet.Cells[iRow, iCol + 2].Value = "\'" + it.Categories.Count.ToString();
-                pSheet.Cells[iRow, iCol + 3].Value = it.Time;
-                pSheet.Cells[iRow, iCol + 4].Value = it.Money;
+                pSheet.Cells[iRow, iCol + 1].Value = "\'" + it.Categories.Count.ToString();
+                pSheet.Cells[iRow, iCol + 2].Value = "\'" + it.AccountNo.ToString("0###");
+
+                pSheet.Cells[iRow, iCol + 3].Value = it.Time; //it.CopyCell(DataItem.iTime, pSheet.Cells, iCol + 3); //pSheet.Cells[iRow, iCol + 3].Value = it.Time;
+                pSheet.Cells[iRow, iCol + 4].Value = it.MoneyOriginalValue;
+                //it.CopyCell(DataItem.iMoney, pSheet.Cells, iCol + 4); //pSheet.Cells[iRow, iCol + 4].Value = it.Money;
+
                 pSheet.Cells[iRow, iCol + 5].Value = it.Description;
                 pSheet.Cells[iRow, iCol + 6].Value = it.CounterParty;
+                pSheet.Cells[iRow, iCol + 7].Value = it.CategoriesList;
+
                 iRow++;
 
                 Thread.Sleep(1);
@@ -217,6 +226,12 @@ namespace OsbbRev2
             }
         }
 
+        private void setStatus(string msg)
+        {
+            if (this.UpdateStatusBar != null)
+                this.UpdateStatusBar(msg);
+        }
+
         private void flushCategory(ref int iRow, int iCol, CategoryDescriptor cd, List<DataItem> list, Excel.Worksheet pSheet, string pCategory)
         {
             Trace.WriteLine(string.Format("  ++ flushCategory( R{0}/C{1}; {2} items; category={3} ... )", iRow, iCol, list.Count, pCategory));
@@ -253,6 +268,16 @@ namespace OsbbRev2
         private List<CategoryDescriptor> tmpList = new List<CategoryDescriptor>();
 
         #endregion // Implementation details
+
+        public static void PostCaptions(Excel.Worksheet pSheet, int iRow, int iCol, string[] pCapptions)
+        {
+            int idx = -1;
+            foreach (string cap in pCapptions)
+            {
+                idx++;
+                pSheet.Cells[iRow, iCol + idx].Value = cap;
+            }
+        }
 
     }
 }

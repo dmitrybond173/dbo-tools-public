@@ -46,6 +46,7 @@
             this.txtFilename = new System.Windows.Forms.TextBox();
             this.labFilename = new System.Windows.Forms.Label();
             this.splitter1 = new System.Windows.Forms.Splitter();
+            this.chkUseWorker = new System.Windows.Forms.CheckBox();
             this.statusStrip1.SuspendLayout();
             this.panLogger.SuspendLayout();
             this.panMain.SuspendLayout();
@@ -90,9 +91,9 @@
             this.panLogger.Controls.Add(this.lvLogger);
             this.panLogger.Controls.Add(this.labLog);
             this.panLogger.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panLogger.Location = new System.Drawing.Point(0, 106);
+            this.panLogger.Location = new System.Drawing.Point(0, 130);
             this.panLogger.Name = "panLogger";
-            this.panLogger.Size = new System.Drawing.Size(680, 190);
+            this.panLogger.Size = new System.Drawing.Size(680, 166);
             this.panLogger.TabIndex = 8;
             // 
             // lvLogger
@@ -106,7 +107,7 @@
             this.lvLogger.Location = new System.Drawing.Point(0, 17);
             this.lvLogger.MultiSelect = false;
             this.lvLogger.Name = "lvLogger";
-            this.lvLogger.Size = new System.Drawing.Size(680, 173);
+            this.lvLogger.Size = new System.Drawing.Size(680, 149);
             this.lvLogger.TabIndex = 1;
             this.lvLogger.UseCompatibleStateImageBehavior = false;
             this.lvLogger.View = System.Windows.Forms.View.Details;
@@ -132,6 +133,7 @@
             // 
             // panMain
             // 
+            this.panMain.Controls.Add(this.chkUseWorker);
             this.panMain.Controls.Add(this.chkAddDetalization);
             this.panMain.Controls.Add(this.chkAppVisible);
             this.panMain.Controls.Add(this.btnAnalyze);
@@ -142,13 +144,13 @@
             this.panMain.Dock = System.Windows.Forms.DockStyle.Top;
             this.panMain.Location = new System.Drawing.Point(0, 0);
             this.panMain.Name = "panMain";
-            this.panMain.Size = new System.Drawing.Size(680, 103);
+            this.panMain.Size = new System.Drawing.Size(680, 127);
             this.panMain.TabIndex = 9;
             // 
             // chkAddDetalization
             // 
             this.chkAddDetalization.AutoSize = true;
-            this.chkAddDetalization.Location = new System.Drawing.Point(15, 80);
+            this.chkAddDetalization.Location = new System.Drawing.Point(15, 79);
             this.chkAddDetalization.Name = "chkAddDetalization";
             this.chkAddDetalization.Size = new System.Drawing.Size(101, 17);
             this.chkAddDetalization.TabIndex = 13;
@@ -221,11 +223,21 @@
             // splitter1
             // 
             this.splitter1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.splitter1.Location = new System.Drawing.Point(0, 103);
+            this.splitter1.Location = new System.Drawing.Point(0, 127);
             this.splitter1.Name = "splitter1";
             this.splitter1.Size = new System.Drawing.Size(680, 3);
             this.splitter1.TabIndex = 10;
             this.splitter1.TabStop = false;
+            // 
+            // chkUseWorker
+            // 
+            this.chkUseWorker.AutoSize = true;
+            this.chkUseWorker.Location = new System.Drawing.Point(15, 101);
+            this.chkUseWorker.Name = "chkUseWorker";
+            this.chkUseWorker.Size = new System.Drawing.Size(140, 17);
+            this.chkUseWorker.TabIndex = 13;
+            this.chkUseWorker.Text = "Use background worker";
+            this.chkUseWorker.UseVisualStyleBackColor = true;
             // 
             // FormMain
             // 
@@ -271,6 +283,7 @@
         private System.Windows.Forms.TextBox txtFilename;
         private System.Windows.Forms.Label labFilename;
         private System.Windows.Forms.Splitter splitter1;
+        private System.Windows.Forms.CheckBox chkUseWorker;
     }
 }
 

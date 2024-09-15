@@ -12,6 +12,7 @@ using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 using XService.Utils;
 using Excel = Microsoft.Office.Interop.Excel;
@@ -129,6 +130,21 @@ namespace OsbbRev2
             return true;
         }
 
+        private void prepareAnalysis()
+        {
+            // read all required values from UI
+            if (chkAddDetalization.Checked)
+                classificator.Flags |= Classificator.EFlags.AddDetalisation;
+            else
+                classificator.Flags &= ~Classificator.EFlags.AddDetalisation;
+        }
+
+        private static void runPerformAnalysis(object state)
+        { 
+            FormMain form = (FormMain)state;
+            form.performAnalysis();
+        }
+
         private void performAnalysis()
         {
             string errMsg;
@@ -137,11 +153,6 @@ namespace OsbbRev2
                 setStatus("Failure!", errMsg);
                 return;
             }
-
-            if (chkAddDetalization.Checked)
-                classificator.Flags |= Classificator.EFlags.AddDetalisation;
-            else
-                classificator.Flags &= ~Classificator.EFlags.AddDetalisation;
 
             wSheet.Activate();
 
@@ -238,10 +249,32 @@ namespace OsbbRev2
                     (pLab2 != null ? pLab2 : "(null)")
                     ));
 
-                if (pLab1 != null) { stLab1.Text = pLab1; }
-                if (pLab2 != null) { stLab2.Text = pLab2; }
+                if (pLab1 != null) setStLab(stLab1, pLab1); // { stLab1.Text = pLab1; }
+                if (pLab2 != null) setStLab(stLab2, pLab2); // { stLab2.Text = pLab2; }
+
                 statusStrip1.Refresh();
             }
+        }
+
+        private void setStLab(ToolStripStatusLabel pLab, string pMsg)
+        {
+            //pLab.Text = pMsg;
+
+            if (pMsg.StartsWith("+"))
+            {
+                int n = pLab.Text.IndexOf("+");
+                if (n >= 0)
+                    pLab.Text = pLab.Text.Substring(0, n);
+
+                pLab.Text += pMsg;
+            }
+            else
+                pLab.Text = pMsg;
+        }
+
+        private void setStatusLab2(string pLab2)
+        {
+            setStatus(null, pLab2);
         }
 
         #endregion // Update UI
@@ -329,6 +362,12 @@ namespace OsbbRev2
             s = ConfigurationManager.AppSettings["AddDetalization"];
             if (!string.IsNullOrEmpty(s))
                 this.chkAddDetalization.Checked = StrUtils.GetAsBool(s);
+
+            s = ConfigurationManager.AppSettings["UseBackgroundWorker"];
+            if (string.IsNullOrEmpty(s))
+                s = ConfigurationManager.AppSettings["UseWorker"];
+            if (!string.IsNullOrEmpty(s))
+                this.chkUseWorker.Checked = StrUtils.GetAsBool(s);
         }
 
         private void FormMain_Shown(object sender, EventArgs e)
@@ -337,6 +376,7 @@ namespace OsbbRev2
 
             setStatus("Loading config...", "");
             this.classificator = new Classificator();
+            this.classificator.UpdateStatusBar += this.setStatusLab2;
             setStatus("Ready.", "");
         }
 
@@ -364,7 +404,14 @@ namespace OsbbRev2
         {
             Trace.WriteLine(string.Format("--- FormMain:btnAnalyze_Click()"));
 
-            performAnalysis();
+            prepareAnalysis();
+
+            if (chkUseWorker.Checked)
+            {
+                ThreadPool.QueueUserWorkItem(runPerformAnalysis, this);
+            }
+            else
+                performAnalysis();
         }
 
         private void btnBrowse_Click(object sender, EventArgs e)

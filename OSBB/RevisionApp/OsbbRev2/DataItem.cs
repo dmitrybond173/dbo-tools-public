@@ -22,6 +22,7 @@ namespace OsbbRev2
             if (Int32.TryParse(s, out n))
             {
                 result.AccountNo = n;
+                result.MoneyOriginalValue = pRow.Cells[iMoney].Value;
                 result.Money = (float)pRow.Cells[iMoney].Value;
             }
             else
@@ -106,12 +107,34 @@ namespace OsbbRev2
         }
 
         public float Money { get; set; }
+        public object MoneyOriginalValue { get; set; }
 
         public int RowIndex { get; set; }
 
         public Excel.Range Row { get; set; }
 
+        public void CopyCell(int pSourceCellNo, Excel.Range pTargetRow, int pTargetCellNo)
+        {
+            pTargetRow.Cells[pTargetCellNo].Value = this.Row.Cells[pSourceCellNo].Value;
+        }
+
         public CategoryDescriptor Category { get; set; }
         public List<CategoryDescriptor> Categories { get; set; }
+        public string CategoriesList 
+        { 
+            get 
+            {
+                string result = "";
+                string delim = "; ";
+                foreach (CategoryDescriptor it in this.Categories)
+                {
+                    result += it.Caption;
+                    result += delim;
+                }
+                if (result.Length > delim.Length)
+                    result = result.Substring(0, result.Length - delim.Length);
+                return result;
+            } 
+        }
     }
 }
