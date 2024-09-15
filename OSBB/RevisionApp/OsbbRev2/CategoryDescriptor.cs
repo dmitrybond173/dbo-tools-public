@@ -27,6 +27,7 @@ namespace OsbbRev2
             this.CfgNode = pCfgNode;
             this.AccountNo = 0;
             this.Patterns = new List<Pattern>();
+            this.HasExclusionPattern = false;
 
             loadConfiguration();
         }
@@ -42,16 +43,32 @@ namespace OsbbRev2
         public int AccountNo { get; protected set; }
 
         public List<Pattern> Patterns { get; protected set; }
+        public bool HasExclusionPattern { get; protected set; }
 
         public bool IsMatch(DataItem pItem)
         {
             if (this.AccountNo != 0 && pItem.AccountNo != this.AccountNo)
                 return false;
 
+            if (this.HasExclusionPattern)
+            {
+                foreach (Pattern p in this.Patterns)
+                {
+                    // skip all normal patterns - they will be checked later
+                    if (!p.IsExcluded) continue;
+
+                    // check exclusion pattern
+                    if (p.IsMatch(pItem))
+                        return false;
+                }
+            }
+
             foreach (Pattern p in this.Patterns) 
             {
-                if (p.IsMatch(pItem)) 
+                if (p.IsMatch(pItem))
+                {
                     return true;
+                }
             }
             return (this.Patterns.Count == 0); // when no patterns - it is always match
         }
@@ -68,15 +85,19 @@ namespace OsbbRev2
             attr = AppUtils.OptionalAttr("accountNo", this.CfgNode);
             if (attr != null && StrUtils.GetAsInt(attr.Value, out n))
                 this.AccountNo = n;
-
+            
             foreach (XmlNode node in this.CfgNode.ChildNodes) 
             {
                 if (node.NodeType != XmlNodeType.Element) continue;
                 if (StrUtils.IsSameText(node.Name, "Pattern"))
                 {
                     Pattern p = Pattern.Load((XmlElement)node);
-                    if (p != null) 
+                    if (p != null)
+                    {
                         this.Patterns.Add(p);
+                        if (p.IsExcluded)
+                            this.HasExclusionPattern = true;
+                    }
                 }
             }
         }
@@ -98,6 +119,8 @@ namespace OsbbRev2
 
                 foreach (XmlNode node in pCfgNode.Attributes)
                 {
+                    if (StrUtils.IsSameText(node.Name, "exclude"))
+                        result.IsExcluded = StrUtils.GetAsBool(node.Value);
                     if (StrUtils.IsSameText(node.Name, "startsWith"))
                         result.StartsWith = node.Value;
                     if (StrUtils.IsSameText(node.Name, "contains"))
@@ -112,11 +135,12 @@ namespace OsbbRev2
 
             internal Pattern() 
             {
+                this.IsExcluded = false;
             }
 
             public override string ToString()
             {
-                string s = string.Format("Pattern[field={0}; ", this.Field);
+                string s = string.Format("{0}Pattern[field={1}; ", (this.IsExcluded ? "Not-" : ""), this.Field);
                 if (this.StartsWith != null)
                     s += string.Format("starts={0}; ", this.StartsWith);
                 if (this.Contains != null)
@@ -137,6 +161,7 @@ namespace OsbbRev2
 
             public EField Field = EField.Description;
 
+            public bool IsExcluded { get; protected set; }
             public string StartsWith { get; protected set; }
             public string Contains { get; protected set; }
             public string EndsWith { get; protected set; }

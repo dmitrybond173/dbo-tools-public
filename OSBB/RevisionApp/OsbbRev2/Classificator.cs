@@ -170,6 +170,8 @@ namespace OsbbRev2
                 if (HasFlag(EFlags.AddDetalisation))
                     PostDataItems(idx, iCol + 6, ref iRow, defList, pSheet, categoryName);
             }
+
+            flushCategory(ref iRow, iCol, this.DefaultCategory, null, pSheet, "---end---");
         }
 
         private static string[] colNames = new string[] { 
@@ -290,24 +292,27 @@ namespace OsbbRev2
             float sum = 0;
             float totalIn = 0;
             float totalOut = 0;
-            int idx = -1;
-            foreach (DataItem item in list)
+            if (list != null)
             {
-                idx++;
-                if (idx > 0 && (idx % 100) == 0)
-                    Trace.WriteLine(string.Format("  = item# {0}...", idx));
+                int idx = -1;
+                foreach (DataItem item in list)
+                {
+                    idx++;
+                    if (idx > 0 && (idx % 100) == 0)
+                        Trace.WriteLine(string.Format("  = item# {0}...", idx));
 
-                sum += item.Money;
-                if (item.Money > 0) totalIn += item.Money;
-                if (item.Money < 0) totalOut += item.Money;
+                    sum += item.Money;
+                    if (item.Money > 0) totalIn += item.Money;
+                    if (item.Money < 0) totalOut += item.Money;
+                }
             }
 
             pSheet.Cells[iRow, iCol].Value = sum;
             pSheet.Cells[iRow, iCol + 1].Value = totalIn;
             pSheet.Cells[iRow, iCol + 2].Value = totalOut;
 
-            pSheet.Cells[iRow, iCol + 3].Value = list.Count;
-            pSheet.Cells[iRow, iCol + 4].Value = cd.Caption;
+            pSheet.Cells[iRow, iCol + 3].Value = (list != null ? list.Count : -1);
+            pSheet.Cells[iRow, iCol + 4].Value = (cd != null ? cd.Caption : "---");
 
             iRow += 2;
 
