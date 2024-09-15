@@ -137,6 +137,8 @@ namespace OsbbRev2
                 classificator.Flags |= Classificator.EFlags.AddDetalisation;
             else
                 classificator.Flags &= ~Classificator.EFlags.AddDetalisation;
+
+            classificator.MaxRows = (int)nudTakeFirstNRows.Value;
         }
 
         private static void runPerformAnalysis(object state)
@@ -156,7 +158,9 @@ namespace OsbbRev2
 
             wSheet.Activate();
 
-            DateTime t1 = DateTime.Now;
+            DateTime ts1 = DateTime.Now;
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
             int iRow = 10;
             int iCol = 7;
             bool isOpened = false;
@@ -164,6 +168,12 @@ namespace OsbbRev2
             List<CategoryDescriptor> list = new List<CategoryDescriptor>();
             while (true)
             {
+                if (classificator.MaxRows > 0 && iRow > classificator.MaxRows)
+                {
+                    Trace.WriteLine(string.Format("BREAK: stop at row#{0}", iRow));
+                    break;
+                }
+
                 Excel.Range row = wSheet.Rows[iRow];
                 var vDescr = row.Cells[iCol].Value;
 
@@ -196,7 +206,10 @@ namespace OsbbRev2
 
                 //DBG: if (iRow > 500) break;
             }
-            DateTime t2 = DateTime.Now;
+            
+            classificator.FinalizeAnalysis();
+
+            DateTime ts2 = DateTime.Now;
 
             setStatus(null, string.Format("Building statistic..."));
             classificator.FlushData(wTrgSheet);
@@ -206,12 +219,44 @@ namespace OsbbRev2
 
             app.Visible = true;
 
-            setStatus("Ready.", string.Format("{0} rows, dT[{1}..{2}]={3} sec", 
+            stopWatch.Stop();
+            setStatus("Ready.", string.Format("{0} rows, dT[{1}..{2}]={3} / {4} sec", 
                 iRow, 
-                StrUtils.CompactNskTimestampOf(t1).Substring(0, 15),
-                StrUtils.CompactNskTimestampOf(t2).Substring(0, 15),
-                (t2 - t1).TotalSeconds.ToString("N1")) 
-                );
+                StrUtils.CompactNskTimestampOf(ts1).Substring(0, 15),
+                StrUtils.CompactNskTimestampOf(ts2).Substring(0, 15),
+                (ts2 - ts1).TotalSeconds.ToString("N1"),
+                stopWatch.Elapsed.TotalSeconds.ToString("N1")
+                ) );
+        }
+
+        private void loadCfg()
+        {
+            string s = ConfigurationManager.AppSettings["Filename"];
+            if (!string.IsNullOrEmpty(s))
+                txtFilename.Text = s;
+
+            s = ConfigurationManager.AppSettings["WorksheetName"];
+            if (!string.IsNullOrEmpty(s))
+                this.sourceWorksheetName = s;
+
+            s = ConfigurationManager.AppSettings["AppVisible"];
+            if (!string.IsNullOrEmpty(s))
+                this.chkAppVisible.Checked = StrUtils.GetAsBool(s);
+
+            s = ConfigurationManager.AppSettings["AddDetalization"];
+            if (!string.IsNullOrEmpty(s))
+                this.chkAddDetalization.Checked = StrUtils.GetAsBool(s);
+
+            s = ConfigurationManager.AppSettings["UseBackgroundWorker"];
+            if (string.IsNullOrEmpty(s))
+                s = ConfigurationManager.AppSettings["UseWorker"];
+            if (!string.IsNullOrEmpty(s))
+                this.chkUseWorker.Checked = StrUtils.GetAsBool(s);
+
+            int n;
+            s = ConfigurationManager.AppSettings["MaxRows"];
+            if (!string.IsNullOrEmpty(s) && StrUtils.GetAsInt(s, out n))
+                nudTakeFirstNRows.Value = n;
         }
 
         #region Update UI
@@ -347,27 +392,7 @@ namespace OsbbRev2
 
             this.originalCaption = this.Text;
 
-            string s = ConfigurationManager.AppSettings["Filename"];
-            if (!string.IsNullOrEmpty(s))
-                txtFilename.Text = s;
-
-            s = ConfigurationManager.AppSettings["WorksheetName"];
-            if (!string.IsNullOrEmpty(s))
-                this.sourceWorksheetName = s;
-
-            s = ConfigurationManager.AppSettings["AppVisible"];
-            if (!string.IsNullOrEmpty(s))
-                this.chkAppVisible.Checked = StrUtils.GetAsBool(s);
-
-            s = ConfigurationManager.AppSettings["AddDetalization"];
-            if (!string.IsNullOrEmpty(s))
-                this.chkAddDetalization.Checked = StrUtils.GetAsBool(s);
-
-            s = ConfigurationManager.AppSettings["UseBackgroundWorker"];
-            if (string.IsNullOrEmpty(s))
-                s = ConfigurationManager.AppSettings["UseWorker"];
-            if (!string.IsNullOrEmpty(s))
-                this.chkUseWorker.Checked = StrUtils.GetAsBool(s);
+            loadCfg();
         }
 
         private void FormMain_Shown(object sender, EventArgs e)

@@ -23,6 +23,7 @@ namespace OsbbRev2
             {
                 result.AccountNo = n;
                 result.MoneyOriginalValue = pRow.Cells[iMoney].Value;
+                result.MoneyValue = (decimal)pRow.Cells[iMoney].Value;
                 result.Money = (float)pRow.Cells[iMoney].Value;
             }
             else
@@ -45,7 +46,10 @@ namespace OsbbRev2
             this._time = pSrc._time;
             this._description = pSrc._description;
             this._counterParty = pSrc._counterParty;
+            
             this.Money = pSrc.Money;
+            this.MoneyValue = pSrc.MoneyValue;
+            this.MoneyOriginalValue = pSrc.MoneyOriginalValue;
 
             this.Category = pSrc.Category;
         }
@@ -108,6 +112,7 @@ namespace OsbbRev2
 
         public float Money { get; set; }
         public object MoneyOriginalValue { get; set; }
+        public decimal MoneyValue { get; set; }
 
         public int RowIndex { get; set; }
 

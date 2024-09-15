@@ -38,6 +38,9 @@
             this.chEvt = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.labLog = new System.Windows.Forms.Label();
             this.panMain = new System.Windows.Forms.Panel();
+            this.nudTakeFirstNRows = new System.Windows.Forms.NumericUpDown();
+            this.label1 = new System.Windows.Forms.Label();
+            this.chkUseWorker = new System.Windows.Forms.CheckBox();
             this.chkAddDetalization = new System.Windows.Forms.CheckBox();
             this.chkAppVisible = new System.Windows.Forms.CheckBox();
             this.btnAnalyze = new System.Windows.Forms.Button();
@@ -46,10 +49,10 @@
             this.txtFilename = new System.Windows.Forms.TextBox();
             this.labFilename = new System.Windows.Forms.Label();
             this.splitter1 = new System.Windows.Forms.Splitter();
-            this.chkUseWorker = new System.Windows.Forms.CheckBox();
             this.statusStrip1.SuspendLayout();
             this.panLogger.SuspendLayout();
             this.panMain.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudTakeFirstNRows)).BeginInit();
             this.SuspendLayout();
             // 
             // dlgOpen
@@ -133,6 +136,8 @@
             // 
             // panMain
             // 
+            this.panMain.Controls.Add(this.nudTakeFirstNRows);
+            this.panMain.Controls.Add(this.label1);
             this.panMain.Controls.Add(this.chkUseWorker);
             this.panMain.Controls.Add(this.chkAddDetalization);
             this.panMain.Controls.Add(this.chkAppVisible);
@@ -146,6 +151,37 @@
             this.panMain.Name = "panMain";
             this.panMain.Size = new System.Drawing.Size(680, 127);
             this.panMain.TabIndex = 9;
+            // 
+            // nudTakeFirstNRows
+            // 
+            this.nudTakeFirstNRows.Location = new System.Drawing.Point(243, 73);
+            this.nudTakeFirstNRows.Maximum = new decimal(new int[] {
+            999999,
+            0,
+            0,
+            0});
+            this.nudTakeFirstNRows.Name = "nudTakeFirstNRows";
+            this.nudTakeFirstNRows.Size = new System.Drawing.Size(120, 20);
+            this.nudTakeFirstNRows.TabIndex = 15;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(240, 57);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(155, 13);
+            this.label1.TabIndex = 14;
+            this.label1.Text = "Take first N rows (0 - unlimited):";
+            // 
+            // chkUseWorker
+            // 
+            this.chkUseWorker.AutoSize = true;
+            this.chkUseWorker.Location = new System.Drawing.Point(15, 101);
+            this.chkUseWorker.Name = "chkUseWorker";
+            this.chkUseWorker.Size = new System.Drawing.Size(140, 17);
+            this.chkUseWorker.TabIndex = 13;
+            this.chkUseWorker.Text = "Use background worker";
+            this.chkUseWorker.UseVisualStyleBackColor = true;
             // 
             // chkAddDetalization
             // 
@@ -229,16 +265,6 @@
             this.splitter1.TabIndex = 10;
             this.splitter1.TabStop = false;
             // 
-            // chkUseWorker
-            // 
-            this.chkUseWorker.AutoSize = true;
-            this.chkUseWorker.Location = new System.Drawing.Point(15, 101);
-            this.chkUseWorker.Name = "chkUseWorker";
-            this.chkUseWorker.Size = new System.Drawing.Size(140, 17);
-            this.chkUseWorker.TabIndex = 13;
-            this.chkUseWorker.Text = "Use background worker";
-            this.chkUseWorker.UseVisualStyleBackColor = true;
-            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -259,6 +285,7 @@
             this.panLogger.ResumeLayout(false);
             this.panMain.ResumeLayout(false);
             this.panMain.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudTakeFirstNRows)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -284,6 +311,8 @@
         private System.Windows.Forms.Label labFilename;
         private System.Windows.Forms.Splitter splitter1;
         private System.Windows.Forms.CheckBox chkUseWorker;
+        private System.Windows.Forms.NumericUpDown nudTakeFirstNRows;
+        private System.Windows.Forms.Label label1;
     }
 }
 

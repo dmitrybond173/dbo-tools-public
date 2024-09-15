@@ -26,8 +26,10 @@ namespace OsbbRev2
         {
             this.Categories = new List<CategoryDescriptor>();
             this.Data = new Dictionary<CategoryDescriptor, List<DataItem> >();
+            this.Items = new List<DataItem>();
             this.DefaultCategory = null;
             this.Flags = EFlags.None;
+            this.MaxRows = 0;
 
             loadConfiguration();
         }
@@ -45,22 +47,48 @@ namespace OsbbRev2
         public List<CategoryDescriptor> Categories { get; protected set; }
         public Dictionary<CategoryDescriptor, List<DataItem>> Data { get; protected set; }
         public CategoryDescriptor DefaultCategory { get; protected set; }
+        public List<DataItem> Items { get; protected set; }
         public EFlags Flags { get; set; }
+        public int MaxRows { get; set; }
+        public FilterDescriptor Filter { get; protected set; }
 
         public bool HasFlag(EFlags pFlag)
         { 
             return ((this.Flags & pFlag) == pFlag);
         }
 
+        public bool IsAcceptedByFilter(DataItem pItem)
+        {
+            if (this.Filter == null) return true;
+
+            foreach (string it in this.Filter.Accounts)
+            {
+                if (it == pItem.AccountNo.ToString())
+                    return true;
+            }
+            return false;
+        }
+
         public void Analyze(DataItem pItem, Excel.Range pRow, int pRowIndex)
         {
+            if (!IsAcceptedByFilter(pItem))
+            {
+                Trace.WriteLine(string.Format("FILTERED-OUT: row# {0}", pRowIndex));
+                return;
+            }
+
             tmpList.Clear();
             int cnt = Match(pItem, tmpList);
             Trace.WriteLine(string.Format("? cls[{0} categories]: {1} ", cnt, pItem));
             if (cnt == 0)
+            {
+                Trace.WriteLine(string.Format(" = row# {0} - use default-category", pRowIndex));
                 tmpList.Add(this.DefaultCategory);
+            }
 
             pItem.Categories.AddRange(tmpList);
+
+            this.Items.Add(pItem);
 
             foreach (CategoryDescriptor cd in tmpList)
             {
@@ -73,6 +101,15 @@ namespace OsbbRev2
                     this.Data[cd] = trgList;
                 }
                 trgList.Add(item);
+            }
+        }
+
+        public void FinalizeAnalysis()
+        {
+            // check if we have any items were not added to any of categories...
+            foreach (DataItem item in this.Items)
+            {
+                //if ()
             }
         }
 
@@ -109,7 +146,7 @@ namespace OsbbRev2
                 List<DataItem> list = kvp.Value;
 
                 categoryName = string.Format("#{0} - {1}", idx, cd.Caption);
-                setStatus("+ category: " + categoryName);
+                setStatus("+ category: " + string.Format("#{0} of {1} - {2}", idx, this.Data.Count, cd.Caption));
                 Trace.WriteLine(string.Format(" -- Category[{0}]: {1} items...", categoryName, kvp.Value.Count));
 
                 if (this.DefaultCategory == cd)
@@ -151,14 +188,17 @@ namespace OsbbRev2
             {
                 idx++;
                 if (idx > 0 && (idx % 100) == 0)
-                    Trace.WriteLine(string.Format("  = item# {0}.{1}...", pCategoryIdx, idx));
+                    Trace.WriteLine(string.Format("  = item# [{0}] -> {1}...", pCategoryIdx, idx));
 
                 pSheet.Cells[iRow, iCol + 0].Value = "#" + it.RowIndex.ToString("0###");
-                pSheet.Cells[iRow, iCol + 1].Value = "\'" + it.Categories.Count.ToString();
+                //pSheet.Cells[iRow, iCol + 1].Value = "\'" + it.Categories.Count.ToString();
+                pSheet.Cells[iRow, iCol + 1].Value = it.Categories.Count;
                 pSheet.Cells[iRow, iCol + 2].Value = "\'" + it.AccountNo.ToString("0###");
 
                 pSheet.Cells[iRow, iCol + 3].Value = it.Time; //it.CopyCell(DataItem.iTime, pSheet.Cells, iCol + 3); //pSheet.Cells[iRow, iCol + 3].Value = it.Time;
                 pSheet.Cells[iRow, iCol + 4].Value = it.MoneyOriginalValue;
+                pSheet.Cells[iRow, iCol + 4].Value = it.MoneyValue;
+                pSheet.Cells[iRow, iCol + 4].Value = it.Money;
                 //it.CopyCell(DataItem.iMoney, pSheet.Cells, iCol + 4); //pSheet.Cells[iRow, iCol + 4].Value = it.Money;
 
                 pSheet.Cells[iRow, iCol + 5].Value = it.Description;
@@ -216,12 +256,21 @@ namespace OsbbRev2
             {
                 if (node.NodeType != XmlNodeType.Element) continue;
 
-                CategoryDescriptor c = CategoryDescriptor.Load((XmlElement)node);
-                if (c != null)
+                if (StrUtils.IsSameText(node.Name, "Filter"))
                 {
-                    this.Categories.Add(c);
-                    if (c.Patterns.Count == 0 && this.DefaultCategory == null)
-                        this.DefaultCategory = c;
+                    FilterDescriptor f = FilterDescriptor.Load((XmlElement)node);
+                    if (f != null)
+                        this.Filter = f;
+                }
+                else if (StrUtils.IsSameText(node.Name, "Category"))
+                {
+                    CategoryDescriptor c = CategoryDescriptor.Load((XmlElement)node);
+                    if (c != null)
+                    {
+                        this.Categories.Add(c);
+                        if (c.Patterns.Count == 0 && this.DefaultCategory == null)
+                            this.DefaultCategory = c;
+                    }
                 }
             }
         }
@@ -279,5 +328,27 @@ namespace OsbbRev2
             }
         }
 
+        public class FilterDescriptor
+        {
+            public static FilterDescriptor Load(XmlElement pDomNode)
+            {
+                FilterDescriptor result = new FilterDescriptor();
+                
+                XmlNode attr = AppUtils.RequiredAttr("accounts", pDomNode);
+                if (attr != null)
+                {
+                    result.Accounts.AddRange(attr.Value.Replace(";", ",").Trim().Split(','));
+                }
+
+                return result;
+            }
+
+            public FilterDescriptor()
+            {
+                this.Accounts = new List<string>();
+            }
+
+            public List<string> Accounts { get; protected set; }
+        }
     }
 }
