@@ -171,7 +171,7 @@ namespace OsbbRev2
                     PostDataItems(idx, iCol + 6, ref iRow, defList, pSheet, categoryName);
             }
 
-            flushCategory(ref iRow, iCol, this.DefaultCategory, null, pSheet, "---end---");
+            flushCategory(ref iRow, iCol, null, null, pSheet, "---end---");
         }
 
         private static string[] colNames = new string[] { 
@@ -285,7 +285,8 @@ namespace OsbbRev2
 
         private void flushCategory(ref int iRow, int iCol, CategoryDescriptor cd, List<DataItem> list, Excel.Worksheet pSheet, string pCategory)
         {
-            Trace.WriteLine(string.Format("  ++ flushCategory( R{0}/C{1}; {2} items; category={3} ... )", iRow, iCol, list.Count, pCategory));
+            Trace.WriteLine(string.Format("  ++ flushCategory( R{0}/C{1}; {2} items; category={3} ... )", 
+                iRow, iCol, (list != null ? list.Count : -1), (pCategory != null ? pCategory : "---") ));
 
             iRow += 1;
 
