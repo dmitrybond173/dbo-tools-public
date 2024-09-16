@@ -15,6 +15,7 @@ using System.Threading;
 using System.Web;
 using System.Xml;
 using XService.Utils;
+using static OsbbRev2.Classificator;
 using static XService.Utils.SyncUtils.LockInfo;
 using Excel = Microsoft.Office.Interop.Excel;
 
@@ -196,20 +197,23 @@ namespace OsbbRev2
                 pSheet.Cells[iRow, iCol + 0].Value = "#" + it.RowIndex.ToString("0###");
                 
                 pSheet.Cells[iRow, iCol + 1].Value = it.Categories.Count;
-                cr = pSheet.Cells[iRow, iCol + 1];
+                SetCellFormat(pSheet.Cells[iRow, iCol + 1], ECellFormat.Number);
+                //cr = pSheet.Cells[iRow, iCol + 1];
+                //cr.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
 
-                cr.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
                 pSheet.Cells[iRow, iCol + 2].Value = "\'" + it.AccountNo.ToString("0###");
 
                 pSheet.Cells[iRow, iCol + 3].Value = it.Time; //it.CopyCell(DataItem.iTime, pSheet.Cells, iCol + 3); //pSheet.Cells[iRow, iCol + 3].Value = it.Time;
-                cr = pSheet.Cells[iRow, iCol + 3];
-                cr.NumberFormat = "YYYY-MM-DD,hh:mm";
+                SetCellFormat(pSheet.Cells[iRow, iCol + 3], ECellFormat.Timestamp);
+                //cr = pSheet.Cells[iRow, iCol + 3];
+                //cr.NumberFormat = "YYYY-MM-DD,hh:mm";
 
                 pSheet.Cells[iRow, iCol + 4].Value = it.MoneyOriginalValue;
-                cr = pSheet.Cells[iRow, iCol + 4];
+                SetCellFormat(pSheet.Cells[iRow, iCol + 4], ECellFormat.Currency);
+                //cr = pSheet.Cells[iRow, iCol + 4];
                 //cr.NumberFormat = "# ##0,00;[Red]-# ##0,00";
                 //cr.NumberFormat = "$* #,##0.00";
-                cr.NumberFormat = "* #,##0.00 [$]";                
+                //cr.NumberFormat = "* #,##0.00 [$]";                
 
                 //pSheet.Cells[iRow, iCol + 4].Value = it.MoneyValue;
                 //pSheet.Cells[iRow, iCol + 4].Value = it.Money;
@@ -225,6 +229,28 @@ namespace OsbbRev2
             }
 
             Trace.WriteLine(string.Format("   = PostDataItems: done. R{0}/C{1}", iRow, iCol));
+        }
+
+        public enum ECellFormat { Timestamp, Currency, Number }
+
+        public static void SetCellFormat(Excel.Range pCells, ECellFormat pFormat)
+        {
+            string fmt = "@";
+            switch (pFormat)
+            {
+                case ECellFormat.Timestamp: fmt = "YYYY-MM-DD,hh:mm"; break;
+                case ECellFormat.Currency: fmt = "* #,##0.00 [$]"; break;
+                case ECellFormat.Number: 
+                    pCells.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+                    return ;
+                default: return;
+            }
+            pCells.NumberFormat = fmt;
+        }
+
+        public static void SetCellFormat(Excel.Range pCells, string pFormat)
+        {
+            pCells.NumberFormat = pFormat;
         }
 
         public int Match(DataItem pItem, List<CategoryDescriptor> pTargetList)
@@ -321,10 +347,17 @@ namespace OsbbRev2
             }
 
             pSheet.Cells[iRow, iCol].Value = sum;
+            SetCellFormat(pSheet.Cells[iRow, iCol], ECellFormat.Currency);
+
             pSheet.Cells[iRow, iCol + 1].Value = totalIn;
+            SetCellFormat(pSheet.Cells[iRow, iCol + 1], ECellFormat.Currency);
+
             pSheet.Cells[iRow, iCol + 2].Value = totalOut;
+            SetCellFormat(pSheet.Cells[iRow, iCol + 2], ECellFormat.Currency);
 
             pSheet.Cells[iRow, iCol + 3].Value = (list != null ? list.Count : -1);
+            SetCellFormat(pSheet.Cells[iRow, iCol + 3], ECellFormat.Number);
+
             pSheet.Cells[iRow, iCol + 4].Value = (cd != null ? cd.Caption : "---");
 
             iRow += 2;
