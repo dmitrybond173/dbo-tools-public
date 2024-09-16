@@ -11,9 +11,11 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using XService.UI.CommonForms;
 using XService.Utils;
 using Excel = Microsoft.Office.Interop.Excel;
 
@@ -25,6 +27,17 @@ namespace OsbbRev2
 
         public const int MAX_LOGGER_ITEMS = 300;
 
+        private const string HELP_LICENSE_TEXT =
+            "Helper app for OSBB revision process. \r\n" +
+            " \r\n" +
+            "Copyright (c) 2021-2024 Dmitry Bondarenko, Kyiv, Ukraine                        \r\n" +
+            " \r\n" +
+            "Distributed under MIT License\r\n" +
+            "                                                                                \r\n" +
+            "Welcome to send your feedbacks, bug reports, sugestiongs to dima_ben@ukr.net    \r\n" +
+            "or to Dmitry_Bond@hotmail.com                                                   \r\n" +
+            "";
+
         public FormMain()
         {
             InitializeComponent();
@@ -33,6 +46,7 @@ namespace OsbbRev2
         private string originalCaption;
         private string sourceWorksheetName = "СВОДНАЯ";
         private string targetWorksheetName = "Статистика";
+        private string userConfigPath = null;
 
         private Classificator classificator;
 
@@ -392,6 +406,19 @@ namespace OsbbRev2
 
             this.originalCaption = this.Text;
 
+            labVersion.Text = TypeUtils.ApplicationVersionStr;
+
+            try
+            {
+                var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal);
+                this.userConfigPath = config.FilePath;
+            }
+            catch (Exception exc)
+            {
+                Trace.WriteLineIf(TrcLvl.TraceError, TrcLvl.TraceError ? string.Format("! FormMain_Load: {0}\nat {1}",
+                    ErrorUtils.FormatErrorMsg(exc), ErrorUtils.FormatStackTrace(exc)) : "");
+            }
+
             loadCfg();
         }
 
@@ -473,6 +500,34 @@ namespace OsbbRev2
 
             if (_app != null)
                 this.app.Visible = chkAppVisible.Checked;
+        }
+
+        private void labVersion_DoubleClick(object sender, EventArgs e)
+        {
+            Dictionary<string, string> props = new Dictionary<string, string>();
+            TypeUtils.CollectVersionInfoAttributes(props, Assembly.GetEntryAssembly());
+            props["ApplicationName"] = "Helper app for OSBB revision process";
+            props["EOL"] = Environment.NewLine;
+            props["url"] = "https://github.com/dmitrybond173/dbo-tools-public/tree/main/OSBB/RevisionApp";
+            props["userConfig"] = (string.IsNullOrEmpty(this.userConfigPath) ? "-" : this.userConfigPath);
+
+            Assembly asm = Assembly.GetExecutingAssembly();
+            props["HostInfo"] = CommonUtils.HostInfoStamp() + string.Format(" ProcessType:{0};", asm.GetName().ProcessorArchitecture);
+
+            string info = ""
+                + "$(ApplicationName).$(EOL)"
+                + "Version $(Version) / $(FileVersion)$(EOL)"
+                + "Written by Dmitry Bond. (dima_ben@ukr.net)$(EOL)"
+                + "$(EOL)"
+                + "$(HostInfo)$(EOL)"
+                + "$(EOL)"
+                + "$(url)$(EOL)"
+                + "$(EOL)"
+                + "$(userConfig)$(EOL)"
+                + "";
+            info = StrUtils.ExpandParameters(info, props, true);
+            FormAbout.Execute(this, StrUtils.ExpandParameters("About $(ApplicationName)", props, true),
+                info, HELP_LICENSE_TEXT);
         }
 
         #endregion // Form Events Handlers

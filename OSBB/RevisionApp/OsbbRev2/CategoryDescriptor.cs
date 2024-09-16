@@ -55,7 +55,7 @@ namespace OsbbRev2
                 foreach (Pattern p in this.Patterns)
                 {
                     // skip all normal patterns - they will be checked later
-                    if (!p.IsExcluded) continue;
+                    if (!p.IsExclusion) continue;
 
                     // check exclusion pattern
                     if (p.IsMatch(pItem))
@@ -89,13 +89,14 @@ namespace OsbbRev2
             foreach (XmlNode node in this.CfgNode.ChildNodes) 
             {
                 if (node.NodeType != XmlNodeType.Element) continue;
-                if (StrUtils.IsSameText(node.Name, "Pattern"))
+                if (StrUtils.IsSameText(node.Name, "Pattern") || StrUtils.IsSameText(node.Name, "NotPattern"))
                 {
                     Pattern p = Pattern.Load((XmlElement)node);
                     if (p != null)
                     {
                         this.Patterns.Add(p);
-                        if (p.IsExcluded)
+
+                        if (p.IsExclusion)
                             this.HasExclusionPattern = true;
                     }
                 }
@@ -110,6 +111,8 @@ namespace OsbbRev2
             {
                 Pattern result = new Pattern();
 
+                result.IsExclusion = StrUtils.IsSameText(pCfgNode.Name, "NotPattern");
+
                 XmlNode attr = pCfgNode.GetAttributeNode("field");
                 if (attr != null)
                 {
@@ -120,7 +123,7 @@ namespace OsbbRev2
                 foreach (XmlNode node in pCfgNode.Attributes)
                 {
                     if (StrUtils.IsSameText(node.Name, "exclude"))
-                        result.IsExcluded = StrUtils.GetAsBool(node.Value);
+                        result.IsExclusion = StrUtils.GetAsBool(node.Value);
                     if (StrUtils.IsSameText(node.Name, "startsWith"))
                         result.StartsWith = node.Value;
                     if (StrUtils.IsSameText(node.Name, "contains"))
@@ -135,12 +138,12 @@ namespace OsbbRev2
 
             internal Pattern() 
             {
-                this.IsExcluded = false;
+                this.IsExclusion = false;
             }
 
             public override string ToString()
             {
-                string s = string.Format("{0}Pattern[field={1}; ", (this.IsExcluded ? "Not-" : ""), this.Field);
+                string s = string.Format("{0}Pattern[field={1}; ", (this.IsExclusion ? "Not-" : ""), this.Field);
                 if (this.StartsWith != null)
                     s += string.Format("starts={0}; ", this.StartsWith);
                 if (this.Contains != null)
@@ -161,7 +164,7 @@ namespace OsbbRev2
 
             public EField Field = EField.Description;
 
-            public bool IsExcluded { get; protected set; }
+            public bool IsExclusion { get; set; }
             public string StartsWith { get; protected set; }
             public string Contains { get; protected set; }
             public string EndsWith { get; protected set; }

@@ -49,6 +49,7 @@
             this.txtFilename = new System.Windows.Forms.TextBox();
             this.labFilename = new System.Windows.Forms.Label();
             this.splitter1 = new System.Windows.Forms.Splitter();
+            this.labVersion = new System.Windows.Forms.Label();
             this.statusStrip1.SuspendLayout();
             this.panLogger.SuspendLayout();
             this.panMain.SuspendLayout();
@@ -145,6 +146,7 @@
             this.panMain.Controls.Add(this.btnOpen);
             this.panMain.Controls.Add(this.btnBrowse);
             this.panMain.Controls.Add(this.txtFilename);
+            this.panMain.Controls.Add(this.labVersion);
             this.panMain.Controls.Add(this.labFilename);
             this.panMain.Dock = System.Windows.Forms.DockStyle.Top;
             this.panMain.Location = new System.Drawing.Point(0, 0);
@@ -252,9 +254,9 @@
             this.labFilename.AutoSize = true;
             this.labFilename.Location = new System.Drawing.Point(12, 9);
             this.labFilename.Name = "labFilename";
-            this.labFilename.Size = new System.Drawing.Size(78, 13);
+            this.labFilename.Size = new System.Drawing.Size(125, 13);
             this.labFilename.TabIndex = 7;
-            this.labFilename.Text = "Execl Filename";
+            this.labFilename.Text = "Excel document filename";
             // 
             // splitter1
             // 
@@ -264,6 +266,16 @@
             this.splitter1.Size = new System.Drawing.Size(680, 3);
             this.splitter1.TabIndex = 10;
             this.splitter1.TabStop = false;
+            // 
+            // labVersion
+            // 
+            this.labVersion.Location = new System.Drawing.Point(488, 109);
+            this.labVersion.Name = "labVersion";
+            this.labVersion.Size = new System.Drawing.Size(180, 18);
+            this.labVersion.TabIndex = 7;
+            this.labVersion.Text = "...";
+            this.labVersion.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.labVersion.DoubleClick += new System.EventHandler(this.labVersion_DoubleClick);
             // 
             // FormMain
             // 
@@ -313,6 +325,7 @@
         private System.Windows.Forms.CheckBox chkUseWorker;
         private System.Windows.Forms.NumericUpDown nudTakeFirstNRows;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label labVersion;
     }
 }
 

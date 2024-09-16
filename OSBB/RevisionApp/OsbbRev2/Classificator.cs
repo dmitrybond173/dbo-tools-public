@@ -186,6 +186,7 @@ namespace OsbbRev2
 
             iRow++;
             int idx = -1;
+            Excel.Range cr;
             foreach (DataItem it in pList)
             {
                 idx++;
@@ -193,14 +194,25 @@ namespace OsbbRev2
                     Trace.WriteLine(string.Format("  = item# [{0}] -> {1}...", pCategoryIdx, idx));
 
                 pSheet.Cells[iRow, iCol + 0].Value = "#" + it.RowIndex.ToString("0###");
-                //pSheet.Cells[iRow, iCol + 1].Value = "\'" + it.Categories.Count.ToString();
+                
                 pSheet.Cells[iRow, iCol + 1].Value = it.Categories.Count;
+                cr = pSheet.Cells[iRow, iCol + 1];
+
+                cr.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
                 pSheet.Cells[iRow, iCol + 2].Value = "\'" + it.AccountNo.ToString("0###");
 
                 pSheet.Cells[iRow, iCol + 3].Value = it.Time; //it.CopyCell(DataItem.iTime, pSheet.Cells, iCol + 3); //pSheet.Cells[iRow, iCol + 3].Value = it.Time;
+                cr = pSheet.Cells[iRow, iCol + 3];
+                cr.NumberFormat = "YYYY-MM-DD,hh:mm";
+
                 pSheet.Cells[iRow, iCol + 4].Value = it.MoneyOriginalValue;
-                pSheet.Cells[iRow, iCol + 4].Value = it.MoneyValue;
-                pSheet.Cells[iRow, iCol + 4].Value = it.Money;
+                cr = pSheet.Cells[iRow, iCol + 4];
+                //cr.NumberFormat = "# ##0,00;[Red]-# ##0,00";
+                //cr.NumberFormat = "$* #,##0.00";
+                cr.NumberFormat = "* #,##0.00 [$]";                
+
+                //pSheet.Cells[iRow, iCol + 4].Value = it.MoneyValue;
+                //pSheet.Cells[iRow, iCol + 4].Value = it.Money;
                 //it.CopyCell(DataItem.iMoney, pSheet.Cells, iCol + 4); //pSheet.Cells[iRow, iCol + 4].Value = it.Money;
 
                 pSheet.Cells[iRow, iCol + 5].Value = it.Description;
