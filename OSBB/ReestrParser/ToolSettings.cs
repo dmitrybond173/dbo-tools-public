@@ -60,6 +60,7 @@ namespace ReestrParser
             "  -o, --output={format}  - add output format, one of: db, excel (default output is \'db\')\n" +
             "        you can specify {format} with \'-\' prefix to exclude it\n" +
             "  -p, --pause={list}  - set pause params, comma-separated list of: error, begin, end, always\n" +
+            "  -prl, --parallel=[1|0]  - enable/disable parallel processing\n" +
             "  -r, --recursive[=1|0]  - recursive scan; default is 1\r\n" +
             "  -ui=[1|0]   - run in UI-mode; default is 1\r\n" +
             "\r\n" +
@@ -96,6 +97,7 @@ namespace ReestrParser
         public bool Recursive = true;
         public bool UiMode = true;
         public bool CleanupDb = true;
+        public bool Parallel = true;        
         public EPause Pause = EPause.None;
         public List<FileSource> SrcFiles = new List<FileSource>();
         public List<string> Outputs = new List<string>();
@@ -281,6 +283,10 @@ namespace ReestrParser
             {
                 setPause(pv);
             }
+            else if (pn == "prl" || pn == "parallel")
+            {
+                setParallel(pv);
+            }            
             else if (StrUtils.IsSameText(pn, "r") || StrUtils.IsSameText(pn, "recursive"))
             {
                 if (string.IsNullOrEmpty(pv)) pv = "1";
@@ -307,6 +313,12 @@ namespace ReestrParser
                 EPause pau = (EPause)Enum.Parse(typeof(EPause), it.Trim(), true);
                 this.Pause |= pau;
             }
+        }
+                
+        private void setParallel(string pv)
+        {
+            if (pv == "") pv = "1";
+            this.Parallel = StrUtils.GetAsBool(pv);
         }
 
         private void setOutput(string pv)

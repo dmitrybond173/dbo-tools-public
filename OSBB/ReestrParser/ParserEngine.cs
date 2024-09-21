@@ -86,24 +86,48 @@ namespace ReestrParser
             this.Statistic.Reset();            
 
             Trace.WriteLine("=== Parallel processing...");
-            Parallel.ForEach(files, (fi) => 
+            if (this.Settings.Parallel)
             {
-                Trace.WriteLine(string.Format("--- processing: {0} ...", fi.FullName));
+                Parallel.ForEach(files, (fi) =>
+                {
+                    Trace.WriteLine(string.Format("--- processing: {0} ...", fi.FullName));
 
-                ReestrFile f = ReestrFile.Parse(fi);
-                if (f != null)
+                    ReestrFile f = ReestrFile.Parse(fi);
+                    if (f != null)
+                    {
+                        lock (this.ParsedFiles)
+                            this.ParsedFiles.Add(f);
+                        lock (this.Statistic)
+                            this.Statistic.AddFile(f);
+                    }
+                    else
+                    {
+                        this.Statistic.totalFailures++;
+                        Trace.WriteLine(string.Format("!FAIL to parse: {0}", fi.FullName));
+                    }
+                });
+            }
+            else
+            {
+                foreach (FileInfo fi in files)
                 {
-                    lock (this.ParsedFiles)
-                        this.ParsedFiles.Add(f);
-                    lock (this.Statistic)
-                        this.Statistic.AddFile(f);                    
+                    Trace.WriteLine(string.Format("--- processing: {0} ...", fi.FullName));
+
+                    ReestrFile f = ReestrFile.Parse(fi);
+                    if (f != null)
+                    {
+                        lock (this.ParsedFiles)
+                            this.ParsedFiles.Add(f);
+                        lock (this.Statistic)
+                            this.Statistic.AddFile(f);
+                    }
+                    else
+                    {
+                        this.Statistic.totalFailures++;
+                        Trace.WriteLine(string.Format("!FAIL to parse: {0}", fi.FullName));
+                    }
                 }
-                else
-                {
-                    this.Statistic.totalFailures++;
-                    Trace.WriteLine(string.Format("!FAIL to parse: {0}", fi.FullName));
-                }
-            });
+            }
             Trace.WriteLine(string.Format("+++ Parsing completed. Elapsed time: {0} sec", (DateTime.Now - t1).TotalSeconds.ToString("N1")));
             Trace.WriteLine(string.Format("= Statistic: {0} total files, {1} total items", this.ParsedFiles.Count, this.Statistic.totalItems));
             Trace.WriteLine(string.Format("= Statistic: {0} total good files, {1} total wrong files, {2} total failures",

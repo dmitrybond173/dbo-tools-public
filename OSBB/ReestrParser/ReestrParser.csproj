@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <RunArguments>D:\archive\OSBB-revision-2023\РЕЕСТРЫ\*.txt</RunArguments>
+    <RunArguments>-ui=0 -prl=0 D:\archive\RichTown\rev-2021-2024\regs\*.txt</RunArguments>
   </PropertyGroup>
 
   <ItemGroup>
