@@ -20,8 +20,8 @@ import isElevated from 'is-elevated';
 
 //console.log(`${process.env}`);
 
-util.saveToFile('c:/temp/process.json', JSON.stringifyWithCircularRefs(process));
-util.saveToFile('c:/temp/process-env.json', JSON.stringify(process.env));
+//util.saveToFile('c:/temp/process.json', JSON.stringifyWithCircularRefs(process));
+//util.saveToFile('c:/temp/process-env.json', JSON.stringify(process.env));
 
 let pkgInfo = util.loadPackageInfo();
 //let buildInfoStr = `${process.env.npm_package_name}[${process.env.npm_package_version}] @ [${process.env.npm_package_json}]`;

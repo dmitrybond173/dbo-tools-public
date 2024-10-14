@@ -6,7 +6,7 @@ set SvcName=SrvcLstNjs
 set HomePath=C:\inetpub\wwwroot\%SvcName%
 
 nssm stop %SvcName%
-nssm remove %SvcName%
+nssm remove %SvcName% confirm
 
 nssm install %SvcName% "C:\Program Files\nodejs\node.exe" SrvcLstNjs.js
 nssm set %SvcName% AppDirectory %HomePath%
