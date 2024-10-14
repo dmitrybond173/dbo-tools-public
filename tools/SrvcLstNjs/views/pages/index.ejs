@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+
+<!--
+* Simple front-end for OS services.
+* Written on Node.js with EJS.
+* Usually running under NSSM.
+* Final release: September 13, 2024.
+* Author: Dmitry Bond. (dmitry.bond.real@gmail.com)
+-->
+
+<head>
+  <link rel="stylesheet" href="media/site.css" asp-append-version="true" />
+  <!-- script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script -->
+  <script src="modules/axios/dist/axios.min.js"></script>
+  
+  <script lang="javascript">
+
+    function startService(btn, name) {
+      changeServiceStatus(btn, name, true);
+    }
+    function stopService(btn, name) {
+      changeServiceStatus(btn, name, false);
+    }
+    function toggleService(btn, name) {
+      let tRow = btn.parentElement.parentElement.parentElement; // access to <tr>
+      let td1 = tRow.cells[1];
+      let marker = td1.textContent;
+      console.log(`toggleService: st.marker = [${marker}]`);
+      if (btn.value === '...') {        
+        return false;
+      }
+      let isRunning = (marker === 'Running');
+      changeServiceStatus(btn, name, !isRunning);
+    }
+    function setButtonWip(btn, caption) {
+      //console.log(btn.parentElement);
+      btn.parentElement.classList.add("btnSrvcStWip");
+      btn.parentElement.classList.remove("btnSrvcStStopped");
+      btn.parentElement.classList.remove("btnSrvcStRunning");
+      btn.value = caption;
+    }
+    function setSuccess(tRow, btn, run) {
+      console.log(`--->setSuccessFor( #${tRow.dataset.serviceIndex}, action=${run ? 'start':'stop'} )`);
+      let td1 = tRow.cells[1];
+      let td2 = tRow.cells[2];
+      let div = td2.children[0];      
+      //console.log(td2.innerHTML);
+      //console.log(div);
+
+      div.classList.remove("btnSrvcStWip");
+
+      let cl1 = td1.classList.value;
+
+      // if run then it was stopped and we tried to start...
+      if (run) {
+        td1.classList.remove("tdSrvcStStopped");
+        td1.classList.add("tdSrvcStRunning");        
+        td1.textContent = "Running";
+
+        td2.classList.remove("tdSrvcStart");
+        td2.classList.add("tdSrvcStop");
+        
+        div.classList.remove("btnSrvcStStopped");
+        div.classList.add("btnSrvcStRunning");
+        btn.value = "Stop";
+      }
+      // if !run then it was running and we tried to stop...
+      else {
+        td1.classList.remove("tdSrvcStRunning");
+        td1.classList.add("tdSrvcStStopped");
+        td1.textContent = "Stopped";
+
+        td2.classList.remove("tdSrvcStop");
+        td2.classList.add("tdSrvcStart");
+
+        div.classList.remove("btnSrvcStRunning");
+        div.classList.add("btnSrvcStStopped");
+        btn.value = "Start";
+      }
+      let cl2 = td1.classList.value;
+      //console.log(` [${cl1}] => [${cl2}]`);
+    }
+    function changeServiceStatus(btn, name, run) {
+      console.log(`-> try to ${run?'start':'stop'} [${name}]`);
+      let tRow = btn.parentElement.parentElement.parentElement; // access to <tr>
+      //console.log(`tRow: ${tRow}`);
+      setButtonWip(btn, "...");
+      let action = (run ? 'start' : 'stop');
+      let id = encodeURIComponent(name);
+      axios.get(`/api/services?act=${action}&name=${id}`)
+        .then(function (response) {
+          // handle success
+          console.log(response);
+          setSuccess(tRow, btn, run);
+        })
+        .catch(function (error) {
+          // handle error
+          setButtonWip(btn, "ERR!");
+          console.log(error);
+        })
+        .finally(function () {
+          // always executed
+        });
+    }
+
+  </script>
+</head>
+
+<body>
+
+  <main>
+
+    <form method="get">
+
+      <div class="text-center">
+        <h1 class="display-6">Services on <b><%= hostname%></b></h1>
+        <!-- input type="hidden" name="action" value="Refresh" / -->
+        <div class="toolsHeader">
+          <div class="buttons" >
+            <input type="submit" id="submit" value="Refresh" />
+          </div>
+          <div class="infoMsg">
+            ( <%= servicesCount %> of <%= totalServicesCount %> services displayed; loaded at <%= loadedAt %> )
+          </div>
+          <div>
+              <input type="checkbox" id="chk" name="chkShowAll" <%= (showAllServices ? 'checked' : '') %> />
+              <label for="chk">Show All</label>
+              <!-- label for="chk">Show Only Controllable Services</label -->
+          </div>
+        </div> 
+
+        <% if (errorMsg) { %>
+          <p class="errMsg">Last error: <%= errorMsg%></p>
+        <% } else { %>
+          <br />&nbsp;
+        <% } %>
+      </div>
+    </form>
+
+    <table xstyle="border:1px solid black" cellspacing="1" cellpadding="1">
+        <% let idx=-1 %>
+        <% services.forEach( function (srvc) { %>
+          <% 
+            idx++;
+            let cssCls = "tdSrvcSt" + srvc.stateAsString;
+            let btnStCls = "btnSrvcSt" + srvc.stateAsString;
+            let actionTdCls = "tdSrvc";
+            if (srvc.state == 1) actionTdCls += "Start";
+            if (srvc.state == 4) actionTdCls += "Stop";
+            let isControllable = srvc.isControllable;
+            let needToShow = showAllServices || srvc.isControllable;
+          %>
+          <% if (needToShow) { %>
+            <tr id="rwSrvc<%= idx%>" data-service-index="<%= idx%>" >
+              <td class="serviceIndex"><%= idx %></td>
+              <td class="<%= cssCls %>"><%= srvc.stateAsString %></td>
+              <td class="tdSrvcAction <%= actionTdCls %>"> 
+                <% if (isControllable) { %>
+                  <% if (srvc.state == 1) { %>
+                    <div class="<%= btnStCls %>">
+                      <input type="submit" value="Start" onclick="toggleService(this, '<%= srvc.name%>')" />
+                    </div>
+                  <% } %>
+                  <% if (srvc.state == 4) { %>
+                    <div class="<%= btnStCls %>">
+                      <input type="submit" value="Stop" onclick="toggleService(this, '<%= srvc.name%>')" />
+                    </div>
+                  <% } %>
+                <% } %>
+              </td>
+              <td><%= srvc.name %></td>
+              <td><%= srvc.displayName %></td>
+            </tr>
+          <% } %>
+        <% }) %>
+
+    </table>
+
+  </main>
+
+  <footer>
+    <span>
+    info: <%= buildInfo %>
+    </span>
+  </footer>  
+
+</body>
+
+</html>

@@ -1,0 +1,12 @@
+{
+  "config": {
+    "port": 3000,
+    "showAll": true,
+    "contollableServices": [ 
+      "ALG", 
+      "/APC.*/",
+      "Bto*",
+      "/.*Build\\s*To\\s*Order.*/"
+    ]
+  }
+}

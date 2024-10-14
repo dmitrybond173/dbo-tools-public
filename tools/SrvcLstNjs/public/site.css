@@ -1,0 +1,155 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+table {
+  background: white;
+  border-collapse: separate;
+}
+
+td, th {
+  background: #D7D7D7;
+}
+
+table {
+  border-spacing: 2px 2px;
+  background: #fffdea;
+}
+
+td, th {
+  padding: 6px;
+}
+
+.serviceIndex {
+  text-align: end;
+}
+
+.tdSrvcInfo {
+  font-size: 10px;
+}
+
+.errMsg {
+  color: red
+}
+
+.tdSrvcStStopped {
+  color: #781818
+}
+.tdSrvcStStartPending {
+  color: #aa08ea
+}
+.tdSrvcStStopPending {
+  color: #aa08ea
+}
+.tdSrvcStRunning {
+  color: #068a01
+}
+.tdSrvcStContinuePending {
+  color: #780808
+}
+.tdSrvcStPausePending {
+  color: #780808
+}
+.tdSrvcStPaused {
+  color: #780808
+}
+
+.tdSrvcStart {
+  text-align: left;
+}
+.tdSrvcStop {
+  text-align: end;
+}
+.tdSrvcAction {
+  width: 60px;
+  font-size: 10px;
+}
+.tdSrvcAction div {
+  width: 100%;
+  height: 90%;
+  border-radius: 8px;
+}
+.tdSrvcAction .btnSrvcStStopped {
+  background-color: gray;
+}
+.tdSrvcAction .btnSrvcStRunning {
+  background-color: green;
+}
+.tdSrvcAction .btnSrvcStWip {
+  background-color: orange;
+  text-align: center;
+}
+.tdSrvcAction .btnSrvcStStopped input {
+  color: green;
+}
+.tdSrvcAction .btnSrvcStRunning input {
+  color: crimson;
+}
+.tdSrvcAction input[type=submit] {
+  border-radius: 8px;
+}
+
+.toolsHeader {
+  display: inline-block;
+}
+.toolsHeader .buttons {
+  width: 100px;   
+  display: inline-block;
+}
+.toolsHeader .infoMsg {
+  display: inline-block;
+  color: teal;
+}
+
+.tableToolsHeader {
+  text-align: start;
+  background: white;
+}
+
+.tdToolsHeader {
+  background: white;
+  padding: 2px;
+  text-align: start;
+}
+
+.txtCommandBox {
+  width: 100%;
+}
+
+.txtConsoleOutput {
+  color: darkgray;
+}
+
+.tableShellInput {
+  background: white;
+  padding: 0px;
+}
+
+.tableShellInput td {
+  background: white;
+  padding: 0px;
+}
+
+.display-6 {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-size: 32px;
+  font-weight: 300;
+  text-align: left;
+  text-size-adjust: 100%;
+  color: rgb(33, 37, 41);
+}
