@@ -11,6 +11,7 @@
 
 using Microsoft.Extensions.Configuration;
 using System.Configuration;
+using System.Drawing;
 using Wiki.Import;
 using XService.Utils;
 
@@ -45,7 +46,6 @@ namespace Wiki.Import
                     return 1;
 
                 execute();
-
             }
             catch (Exception exc)
             {
@@ -89,14 +89,26 @@ namespace Wiki.Import
             long sumSize = 0;
             int maxLen = 0;
             int fileCnt = 0;
+            int skipCnt = 0;
+
+            // gather statistic on input file
             Dictionary<int, int> sizeStat = new Dictionary<int, int>();
+            List<WikiFile.Page> pagesToProcess = new List<WikiFile.Page>();
             foreach (WikiFile.Page pg in this.wikiFile.Pages)
             {
                 pg.Index = idx;
                 idx++;
 
-                if (pg.Title.ToLower().StartsWith("file:"))
+                string id = pg.Title;
+                string reason;
+
+                if (id.ToLower().StartsWith("file:"))
                     fileCnt++;
+
+                if (!isOkToProceed(id.ToLower(), out reason))
+                    skipCnt++;
+                else
+                    pagesToProcess.Add(pg);
 
                 string txt = pg.LatestRevision.Text;
                 sumSize += txt.Length;
@@ -113,18 +125,21 @@ namespace Wiki.Import
             Trace.WriteLine("--- Some statistic ---");
             string info = string.Format(
                 "{1} notes in total{0}" +
-                "{2} max note length{0}" +
-                "{3} average note length{0}" +
-                "{4} summary length of all notes{0}" +
-                "{5} file:* records{0}" +
-                "{6} sizes in statistic:",
+                "{2} notes ignored{0}" +
+                "{3} max note length{0}" +
+                "{4} average note length{0}" +
+                "{5} summary length of all notes{0}" +
+                "{6} file:* records{0}" +
+                "{7} sizes in statistic:",
                 "\n",
-                this.wikiFile.Pages.Count, maxLen, avgSize, sumSize, fileCnt, sizeStat.Count);
+                this.wikiFile.Pages.Count, skipCnt, maxLen, avgSize, sumSize, fileCnt, sizeStat.Count);
             string[] lines = info.Split('\n');
             foreach (string line in lines) Trace.WriteLine(line);
             List<KeyValuePair<int, int>> szRefs = new List<KeyValuePair<int, int>>();
             foreach (KeyValuePair<int, int> it in sizeStat)
+            {
                 szRefs.Add(it);
+            }
             szRefs.Sort((n1, n2) => n1.Key.CompareTo(n2.Key));
             idx = 0;
             foreach (KeyValuePair<int, int> it in szRefs)
@@ -142,23 +157,48 @@ namespace Wiki.Import
                 return;
             }
 
+            // run actual import
             WikiBrowser saver = new WikiBrowser(this.settings);
 
             if (this.settings.WikiUser != null)
                 saver.LoginToWiki(this.settings.WikiUser, this.settings.WikiPassword);
 
-            foreach (WikiFile.Page pg in this.wikiFile.Pages)
+            // to track correct page # need to loop over original collection!
+            idx = -1;
+            int pgCnt = 0;
+            foreach (WikiFile.Page pg in this.wikiFile.Pages) //foreach (WikiFile.Page pg in pagesToProcess)
             {
+                idx++;
+                if (this.settings.PagesSkip.HasValue && idx < this.settings.PagesSkip)
+                {
+                    Trace.WriteLine(string.Format("! Page# {0}: skip according to settings...", idx));
+                    continue;
+                }
+
+                /* -- this already validated on statistic gatherig
                 string id = pg.Title;
                 string reason;
                 if (!isOkToProceed(id.ToLower(), out reason))
                 {
                     Trace.WriteLine(string.Format("--- {0}: {1}", reason, pg.Title));
                     continue;
+                }*/
+
+                // when page was not included for processing - skip it
+                if (!pagesToProcess.Contains(pg))
+                {
+                    continue;
                 }
 
                 saver.OpenWikiEditor(pg);
                 saver.SubmitWikiPage();
+
+                pgCnt++;
+                if (this.settings.PagesCount.HasValue && pgCnt >= this.settings.PagesCount)
+                {
+                    Trace.WriteLine(string.Format("! Already imported {0} pages. Stop according to settings", pgCnt));
+                    break;
+                }
 
                 Thread.Sleep(1000);
             }
@@ -278,15 +318,23 @@ namespace Wiki.Import
         private bool isOkToProceed(string id, out string pReason)
         {
             pReason = null;
-            if (this.settings.ExcludePages != null && this.settings.ExcludePages.Contains(id.ToLower()))
+            if (this.settings.ExcludePages != null)
             {
-                pReason = "page excluded";
-                return false;
+                bool isMatch = this.settings.ExcludePages.IsMatch(id.ToLower());
+                if (isMatch)
+                {
+                    pReason = "page excluded";
+                    return false;
+                }
             }
-            if (this.settings.IncludePages != null && !this.settings.IncludePages.Contains(id.ToLower()))
+            if (this.settings.IncludePages != null)
             {
-                pReason = "page is not included";
-                return false;
+                bool isMatch = !this.settings.IncludePages.IsMatch(id.ToLower());
+                if (isMatch)
+                {
+                    pReason = "page is not included";
+                    return false;
+                }
             }
             return true;
         }

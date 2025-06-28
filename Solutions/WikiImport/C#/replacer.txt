@@ -1,0 +1,40 @@
+/([\w+\d+])-AP(\d+)/ => SERVER-ZZ$2
+
+DEL01-BEL1 = DEX01-RIN1
+
+Audi => CoolCar1
+BMW => CoolCar2
+BWI => VndrBi
+IAC => VndrIc
+OPEL => MidCar1
+SAAB => BaobCar
+Skoda => MyCar
+VW => MidCar2
+Volvo => Pizvo
+
+X4400 => Z3211
+
+Belchite => Rinhchad
+Ellesmere => Judismare
+Bursa => Hurza
+Ceska => Zhebka
+Coleshill => Bulesha
+France => Frogland
+Halewood => Bolewood
+Gaborone => Lebanon
+Jetta => Buggieta
+Jelesnia => Heresliu
+Luton => Liptone
+Meriva => Murave
+/Meriva(\d+)/ => Murave$1
+Morocco => Kongo
+Ostrow => Ostriv
+Poland => Hohland
+Pedrola => Pedrula
+Sannicolau => Krokotau
+Santana => Pizdana
+Spain => Egypt
+Thermal => Nagnal
+Vauxhall => Verona
+Wuhu => Muhe
+Zaragoza => Barbaroza

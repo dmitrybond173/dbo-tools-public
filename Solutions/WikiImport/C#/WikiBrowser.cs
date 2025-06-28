@@ -85,9 +85,13 @@ namespace Wiki.Import
             Driver.Navigate().GoToUrl(this.CurrentUrl);
 
             var name = Driver.FindElement(By.Name("wpName"));
+            Thread.Sleep(100);
             var passw = Driver.FindElement(By.Name("wpPassword"));
+            Thread.Sleep(100);
             name.SendKeys(pUser);
+            Thread.Sleep(300);
             passw.SendKeys(pPassword);
+            Thread.Sleep(300);
 
             string id = (this.IsNewVersion ? "wploginattempt" : "wpLoginattempt");
             IWebElement loginButton = Driver.FindElement(By.Name(id));
@@ -244,6 +248,12 @@ namespace Wiki.Import
             //textArea.SendKeys(Keys.DELETE);
 
             string txt = CurrentPage.LatestRevision.Text;
+            if (this.Settings.Replacer != null)
+            {
+                int cnt = this.Settings.Replacer.Replace(ref txt);
+                if (cnt > 0)
+                    Trace.WriteLine(string.Format(" ! {0} replacements were made", cnt));
+            }
 
             // WARNING!
             // Seems WebDriver cannot set long text into TextArea!

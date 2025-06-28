@@ -16,6 +16,7 @@ using System.IO;
 using System.Reflection;
 using System.Security;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 //using System.Security.RightsManagement;
@@ -63,7 +64,10 @@ namespace Wiki.Import
             "  -cd, --change-dir={directory}  - switch directory when started\n" +
             "  -ipl, --include-pages-list={filename}  - list of pages to include\n" +
             "  -epl, --exclude-pages-list={filename}  - list of pages to exclude\n" +
+            "  -rplr, --replacer={filename}  - file with definitions what strings to replace\n" +
             "  -p, --pause={list}  - set pause params, comma-separated list of: error, begin, end, always\n" +
+            "  -skip={N}  - skip first N pages\n" +
+            "  -count={N}  - import only specified N pages\n" +
             "  -simulation  - simulation mode\n" +
             "  -wu, --wiki-user={wikiUserName}  - wiki user name\n" +
             "  -wp, --wiki-password={wikiUserPassword}  - wiki user password\n" +
@@ -112,8 +116,11 @@ namespace Wiki.Import
         public string BaseWikiUrl = "http://localhost:8080/w";
         public string WikiUser = null;
         public string WikiPassword = null;
-        public List<string> ExcludePages = null;
-        public List<string> IncludePages = null;
+        public int? PagesSkip = null;
+        public int? PagesCount = null;
+        public NameMatcher ExcludePages = null;
+        public NameMatcher IncludePages = null;
+        public TextReplacer Replacer = null;
         public string UrlReservedChars = " !#$&'()*+,/:;=?@[]";
 
         public ToolSettings()
@@ -285,6 +292,7 @@ namespace Wiki.Import
         private bool parseCliParam(string arg, string pn, string pv)
         {
             bool result = true;
+            int n;
 
             if (StrUtils.IsSameText(pn, "?") || StrUtils.IsSameText(pn, "help"))
             {
@@ -306,13 +314,31 @@ namespace Wiki.Import
             {
                 if (!File.Exists(pv))
                     throw new ToolError(string.Format("File [{0}] is not found!", pv));
-                this.ExcludePages = loadFilesList(pv);
+                //this.ExcludePages = loadFilesList(pv);
+                this.ExcludePages = new NameMatcher(pv);
             }
             else if (StrUtils.IsSameText(pn, "ipl") || StrUtils.IsSameText(pn, "include-pages-list"))
             {
                 if (!File.Exists(pv))
                     throw new ToolError(string.Format("File [{0}] is not found!", pv));
-                this.IncludePages = loadFilesList(pv);
+                //this.IncludePages = loadFilesList(pv);
+                this.IncludePages = new NameMatcher(pv);
+            }
+            else if (StrUtils.IsSameText(pn, "rplr") || StrUtils.IsSameText(pn, "replacer"))
+            {
+                if (!File.Exists(pv))
+                    throw new ToolError(string.Format("File [{0}] is not found!", pv));
+                this.Replacer = new TextReplacer(pv);
+            }
+            else if (StrUtils.IsSameText(pn, "skip"))
+            {
+                if (StrUtils.GetAsInt(pv, out n))
+                    this.PagesSkip = n;
+            }
+            else if (StrUtils.IsSameText(pn, "count"))
+            {
+                if (StrUtils.GetAsInt(pv, out n))
+                    this.PagesCount = n;
             }
             else if (pn == "p" || pn == "pause")
             {
@@ -350,14 +376,29 @@ namespace Wiki.Import
 
         private List<string> loadFilesList(string pFilename)
         {
-            List<string> list = new List<string>();            
+            List<string> list = new List<string>();
             using (StreamReader sr = File.OpenText(pFilename))
             {
                 while (!sr.EndOfStream)
                 {
                     string ln = sr.ReadLine().Trim().ToLower();
                     if (string.IsNullOrEmpty(ln)) continue;
-                    list.Add(ln);
+                    list.Add(ln); 
+                }
+            }
+            return list;
+        }
+
+        private Dictionary<string, string> loadReplacerDefs(string pFilename)
+        {
+            Dictionary<string, string> list = new Dictionary<string, string>();
+            using (StreamReader sr = File.OpenText(pFilename))
+            {
+                while (!sr.EndOfStream)
+                {
+                    string ln = sr.ReadLine().Trim().ToLower();
+                    if (string.IsNullOrEmpty(ln)) continue;
+                    //list.Add(ln);
                 }
             }
             return list;
@@ -478,6 +519,153 @@ namespace Wiki.Import
         }
 
         #endregion // Static API
+
+
+        public class TextReplacer
+        {
+            public TextReplacer(string pFilename)
+            {
+                this.List = new Dictionary<string, string>();
+                this.Patterns = new Dictionary<Regex, string>();
+                load(pFilename);
+            }
+
+            public Dictionary<string, string> List { get; protected set; }
+            public Dictionary<Regex, string> Patterns { get; protected set; }
+
+            public int Replace(ref string pText)
+            {
+                int result = 0;
+                string txtRef = pText.ToLower();
+                foreach (KeyValuePair<string, string> it in this.List)
+                {
+                    int p = txtRef.IndexOf(it.Key.ToLower());
+                    while (p >= 0)
+                    {
+                        result++;
+
+                        if (p > 0)
+                        {
+                            char ch = txtRef[p - 1];
+                            bool isWord = ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z'));
+                            if (isWord) break; // pattern should not be part of other word!
+                        }
+                        if ((p + it.Key.Length + 1) < txtRef.Length - 1)
+                        {
+                            char ch = txtRef[p + it.Key.Length + 1];
+                            bool isWord = ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z'));
+                            if (isWord) break; // pattern should not be part of other word!
+                        }
+
+                        txtRef = txtRef.Remove(p, it.Key.Length);
+                        pText = pText.Remove(p, it.Key.Length);
+                        txtRef = txtRef.Insert(p, it.Value);
+                        pText = pText.Insert(p, it.Value);
+
+                        p = txtRef.IndexOf(it.Key.ToLower());
+                    }
+                }
+
+                foreach (KeyValuePair<Regex, string> it in this.Patterns)
+                {
+                    Regex rexp = it.Key;
+                    rexp.Replace(pText, it.Value);
+                }
+
+                return result;
+            }
+
+            private void load(string pFilename)
+            {
+                string delim = "=>";
+                using (StreamReader sr = File.OpenText(pFilename))
+                {
+                    while (!sr.EndOfStream)
+                    {
+                        string ln = sr.ReadLine().Trim();
+                        if (string.IsNullOrEmpty(ln)) continue;
+
+                        int p = ln.IndexOf(delim);
+                        if (p < 0) continue;
+
+                        string sn = ln.Substring(0, p).Trim(StrUtils.CH_SPACES);
+                        string sv = ln.Remove(0, p + delim.Length).Trim(StrUtils.CH_SPACES);
+
+                        if (sn.StartsWith("/"))
+                            this.Patterns[StrUtils.ExtractRegexp(sn)] = sv;
+                        else
+                            this.List[sn] = sv;
+                    }
+                }
+            }
+        }
+
+
+
+        /// <summary>
+        /// Name matcher: support match by explicit text, by wildcard, by regexp
+        /// </summary>
+        public class NameMatcher
+        {
+            public NameMatcher(string pFilename)
+            {
+                this.Items = new List<string>();
+                this.Patterns = new List<Regex>();
+                this.Wildcards = new List<Regex>();
+                load(pFilename);
+            }
+
+            public List<string> Items { get; protected set; }
+            public List<Regex> Patterns { get; protected set; }
+            public List<Regex> Wildcards { get; protected set; }
+
+            public bool IsMatch(string pSrcText)
+            {
+                string txt = pSrcText.ToLower().Trim();
+                bool isMatch = this.Items.Contains(txt);
+                if (isMatch) return true;
+
+                foreach (Regex rxp in this.Patterns)
+                {
+                    isMatch = rxp.IsMatch(txt);
+                    if (isMatch) return true;
+                }
+
+                foreach (Regex rxp in this.Wildcards)
+                {
+                    isMatch = rxp.IsMatch(txt);
+                    if (isMatch) return true;
+                }
+                return false;
+            }
+
+            private void load(string pFilename)
+            {
+                using (StreamReader sr = File.OpenText(pFilename))
+                {
+                    while (!sr.EndOfStream)
+                    {
+                        string ln = sr.ReadLine().Trim().ToLower();
+                        if (string.IsNullOrEmpty(ln)) continue;
+
+                        if (ln.StartsWith("/"))
+                        {
+                            Regex rxp = StrUtils.ExtractRegexp(ln);
+                            this.Patterns.Add(rxp);
+                        }
+                        else if (ln.Contains("?") || ln.Contains("*"))
+                        {
+                            Regex rxp = StrUtils.FilespecToRexp(ln);
+                            this.Wildcards.Add(rxp);
+                        }
+                        else 
+                        {
+                            this.Items.Add(ln);
+                        }
+                    }
+                }
+            }
+        }
 
     }
 }
