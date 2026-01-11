@@ -132,6 +132,8 @@ namespace OsbbRev2
                         result.EndsWith = node.Value;
                     if (StrUtils.IsSameText(node.Name, "regexp") || StrUtils.IsSameText(node.Name, "rexp"))
                         result.RegexExpression = node.Value;
+                    if (StrUtils.IsSameText(node.Name, "logic"))
+                        result.PatternLogic = StrUtils.IsSameText(node.Value, "OR") ? EPatternLogic.OR : EPatternLogic.AND;
                 }
 
                 foreach (XmlNode node in pCfgNode.ChildNodes)
@@ -154,6 +156,7 @@ namespace OsbbRev2
             {
                 this.IsExclusion = false;
                 this.SubPatterns = null;
+                this.PatternLogic = EPatternLogic.AND;
             }
 
             public override string ToString()
@@ -167,6 +170,10 @@ namespace OsbbRev2
                     s += string.Format("ends={0}; ", this.EndsWith);
                 if (this.RegexExpression != null)
                     s += string.Format("rexp={0}; ", this.RegexExpression);
+                if (this.SubPatterns != null)
+                {
+                    s += string.Format("{0} sub-patterns(by {1}); ", this.SubPatterns.Count, this.PatternLogic);
+                }
                 s += "]";
                 return s;
             }
@@ -179,7 +186,14 @@ namespace OsbbRev2
 
             public EField Field = EField.Description;
 
+            public enum EPatternLogic
+            {
+                AND,
+                OR
+            }
+
             public bool IsExclusion { get; set; }
+            public EPatternLogic PatternLogic { get; set; }
             public string StartsWith { get; protected set; }
             public string Contains { get; protected set; }
             public string EndsWith { get; protected set; }
@@ -200,8 +214,28 @@ namespace OsbbRev2
                 }
             }
 
+            private static List<int> dbg_catch = new List<int>(new int[] {
+                //870, 871, 873, 874, 899, 939, 1030,
+                //1133, 1237, 
+                //1354, 1452,
+                //1608, 1712, 1832
+                1550, 1660
+            });
+
             public bool IsMatch(DataItem pItem)
             {
+                int lvl = 0;
+                return perform_isMatch(pItem, lvl);
+            }
+
+            protected bool perform_isMatch(DataItem pItem, int pLevel)
+            {
+                // DBG:
+                if (dbg_catch.Contains(pItem.RowIndex) && this.SubPatterns != null)
+                {
+                    DataItem.dbg_Tag++;
+                }
+
                 string text = pItem.Description;
                 if (this.Field == EField.CounterParty)
                     text = pItem.CounterParty;
@@ -238,12 +272,24 @@ namespace OsbbRev2
                     bool? res = null;
                     foreach (Pattern p in this.SubPatterns)
                     {
-                        isOk = p.IsMatch(pItem);
-                        if (!res.HasValue) 
-                            result = isOk;
-                        else 
-                            res &= isOk;
-                        if (!res.Value) break;
+                        isOk = p.perform_isMatch(pItem, pLevel + 1);
+
+                        if (this.PatternLogic == EPatternLogic.AND)
+                        {
+                            if (!res.HasValue)
+                                res = isOk;
+                            else
+                                res &= isOk;
+                            if (!res.Value) break;
+                        }
+                        else
+                        { 
+                            if (!res.HasValue)
+                                res = isOk;
+                            else
+                                res |= isOk;
+                            if (res.Value) break;
+                        }
                     }
                     if (!result.HasValue) 
                         result = res.Value;

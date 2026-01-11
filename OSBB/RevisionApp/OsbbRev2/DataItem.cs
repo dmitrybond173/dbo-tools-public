@@ -13,6 +13,8 @@ namespace OsbbRev2
         public static int iDescription = 7;
         public static int iCouterParty = 9;
 
+        public static int dbg_Tag = -1;
+
         public static DataItem Load(Excel.Range pRow, int pRowIndex)
         {
             DataItem result = new DataItem() { Row = pRow, RowIndex = pRowIndex };
