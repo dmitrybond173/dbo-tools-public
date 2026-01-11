@@ -152,6 +152,8 @@ namespace OsbbRev2
             else
                 classificator.Flags &= ~Classificator.EFlags.AddDetalisation;
 
+            classificator.DataStartRow = (int)nudDataStartRow.Value;
+            classificator.PaymentDescrCol = (int)nudPaymentDescrCol.Value;            
             classificator.MaxRows = (int)nudTakeFirstNRows.Value;
         }
 
@@ -172,11 +174,12 @@ namespace OsbbRev2
 
             wSheet.Activate();
 
+            string sDbg;
             DateTime ts1 = DateTime.Now;
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
-            int iRow = 10;
-            int iCol = 7;
+            int iRow = classificator.DataStartRow;
+            int iCol = classificator.PaymentDescrCol;
             bool isOpened = false;
             setStatus("Analyzing...", null);
             List<CategoryDescriptor> list = new List<CategoryDescriptor>();
@@ -197,7 +200,10 @@ namespace OsbbRev2
                         break;
                 }
 
-                bool isSkip = (StrUtils.IsSameText(vDescr, "xxx"));
+                if (iRow > 1465)
+                    sDbg = iRow.ToString();
+
+                bool isSkip = (StrUtils.IsSameText(vDescr, "xxx") || StrUtils.IsSameText(vDescr, "x"));
                 if (!isSkip)
                 {
                     if (vDescr != null)
@@ -271,6 +277,13 @@ namespace OsbbRev2
             s = ConfigurationManager.AppSettings["MaxRows"];
             if (!string.IsNullOrEmpty(s) && StrUtils.GetAsInt(s, out n))
                 nudTakeFirstNRows.Value = n;
+
+            s = ConfigurationManager.AppSettings["DataStartRow"];
+            if (!string.IsNullOrEmpty(s) && StrUtils.GetAsInt(s, out n))
+                nudDataStartRow.Value = n;
+            s = ConfigurationManager.AppSettings["AgentNameColumn"];
+            if (!string.IsNullOrEmpty(s) && StrUtils.GetAsInt(s, out n))
+                nudPaymentDescrCol.Value = n;
         }
 
         #region Update UI
@@ -492,6 +505,9 @@ namespace OsbbRev2
                 return;
             }
             openFile(fn);
+
+            Thread.Sleep(2000);
+            this.BringToFront();
         }
 
         private void chkAppVisible_CheckedChanged(object sender, EventArgs e)

@@ -47,13 +47,19 @@
             this.btnOpen = new System.Windows.Forms.Button();
             this.btnBrowse = new System.Windows.Forms.Button();
             this.txtFilename = new System.Windows.Forms.TextBox();
+            this.labVersion = new System.Windows.Forms.Label();
             this.labFilename = new System.Windows.Forms.Label();
             this.splitter1 = new System.Windows.Forms.Splitter();
-            this.labVersion = new System.Windows.Forms.Label();
+            this.labDataStart = new System.Windows.Forms.Label();
+            this.nudDataStartRow = new System.Windows.Forms.NumericUpDown();
+            this.labAgentNameCol = new System.Windows.Forms.Label();
+            this.nudPaymentDescrCol = new System.Windows.Forms.NumericUpDown();
             this.statusStrip1.SuspendLayout();
             this.panLogger.SuspendLayout();
             this.panMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudTakeFirstNRows)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudDataStartRow)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudPaymentDescrCol)).BeginInit();
             this.SuspendLayout();
             // 
             // dlgOpen
@@ -67,7 +73,7 @@
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.stLab1,
             this.stLab2});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 296);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 403);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(680, 22);
             this.statusStrip1.TabIndex = 7;
@@ -97,7 +103,7 @@
             this.panLogger.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panLogger.Location = new System.Drawing.Point(0, 130);
             this.panLogger.Name = "panLogger";
-            this.panLogger.Size = new System.Drawing.Size(680, 166);
+            this.panLogger.Size = new System.Drawing.Size(680, 273);
             this.panLogger.TabIndex = 8;
             // 
             // lvLogger
@@ -111,7 +117,7 @@
             this.lvLogger.Location = new System.Drawing.Point(0, 17);
             this.lvLogger.MultiSelect = false;
             this.lvLogger.Name = "lvLogger";
-            this.lvLogger.Size = new System.Drawing.Size(680, 149);
+            this.lvLogger.Size = new System.Drawing.Size(680, 256);
             this.lvLogger.TabIndex = 1;
             this.lvLogger.UseCompatibleStateImageBehavior = false;
             this.lvLogger.View = System.Windows.Forms.View.Details;
@@ -137,7 +143,11 @@
             // 
             // panMain
             // 
+            this.panMain.Controls.Add(this.nudPaymentDescrCol);
+            this.panMain.Controls.Add(this.nudDataStartRow);
+            this.panMain.Controls.Add(this.labAgentNameCol);
             this.panMain.Controls.Add(this.nudTakeFirstNRows);
+            this.panMain.Controls.Add(this.labDataStart);
             this.panMain.Controls.Add(this.label1);
             this.panMain.Controls.Add(this.chkUseWorker);
             this.panMain.Controls.Add(this.chkAddDetalization);
@@ -156,7 +166,7 @@
             // 
             // nudTakeFirstNRows
             // 
-            this.nudTakeFirstNRows.Location = new System.Drawing.Point(243, 73);
+            this.nudTakeFirstNRows.Location = new System.Drawing.Point(362, 101);
             this.nudTakeFirstNRows.Maximum = new decimal(new int[] {
             999999,
             0,
@@ -168,12 +178,12 @@
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(240, 57);
+            this.label1.Location = new System.Drawing.Point(201, 104);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(155, 13);
             this.label1.TabIndex = 14;
             this.label1.Text = "Take first N rows (0 - unlimited):";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // chkUseWorker
             // 
@@ -249,6 +259,16 @@
             this.txtFilename.Size = new System.Drawing.Size(498, 20);
             this.txtFilename.TabIndex = 8;
             // 
+            // labVersion
+            // 
+            this.labVersion.Location = new System.Drawing.Point(488, 109);
+            this.labVersion.Name = "labVersion";
+            this.labVersion.Size = new System.Drawing.Size(180, 18);
+            this.labVersion.TabIndex = 7;
+            this.labVersion.Text = "...";
+            this.labVersion.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.labVersion.DoubleClick += new System.EventHandler(this.labVersion_DoubleClick);
+            // 
             // labFilename
             // 
             this.labFilename.AutoSize = true;
@@ -267,21 +287,53 @@
             this.splitter1.TabIndex = 10;
             this.splitter1.TabStop = false;
             // 
-            // labVersion
+            // labDataStart
             // 
-            this.labVersion.Location = new System.Drawing.Point(488, 109);
-            this.labVersion.Name = "labVersion";
-            this.labVersion.Size = new System.Drawing.Size(180, 18);
-            this.labVersion.TabIndex = 7;
-            this.labVersion.Text = "...";
-            this.labVersion.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.labVersion.DoubleClick += new System.EventHandler(this.labVersion_DoubleClick);
+            this.labDataStart.Location = new System.Drawing.Point(201, 56);
+            this.labDataStart.Name = "labDataStart";
+            this.labDataStart.Size = new System.Drawing.Size(155, 13);
+            this.labDataStart.TabIndex = 14;
+            this.labDataStart.Text = "Row# where data starts";
+            this.labDataStart.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // nudDataStartRow
+            // 
+            this.nudDataStartRow.Location = new System.Drawing.Point(362, 53);
+            this.nudDataStartRow.Maximum = new decimal(new int[] {
+            999999,
+            0,
+            0,
+            0});
+            this.nudDataStartRow.Name = "nudDataStartRow";
+            this.nudDataStartRow.Size = new System.Drawing.Size(120, 20);
+            this.nudDataStartRow.TabIndex = 15;
+            // 
+            // labAgentNameCol
+            // 
+            this.labAgentNameCol.Location = new System.Drawing.Point(201, 79);
+            this.labAgentNameCol.Name = "labAgentNameCol";
+            this.labAgentNameCol.Size = new System.Drawing.Size(155, 13);
+            this.labAgentNameCol.TabIndex = 14;
+            this.labAgentNameCol.Text = "Payment description column#";
+            this.labAgentNameCol.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // nudPaymentDescrCol
+            // 
+            this.nudPaymentDescrCol.Location = new System.Drawing.Point(362, 76);
+            this.nudPaymentDescrCol.Maximum = new decimal(new int[] {
+            999999,
+            0,
+            0,
+            0});
+            this.nudPaymentDescrCol.Name = "nudPaymentDescrCol";
+            this.nudPaymentDescrCol.Size = new System.Drawing.Size(120, 20);
+            this.nudPaymentDescrCol.TabIndex = 15;
             // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(680, 318);
+            this.ClientSize = new System.Drawing.Size(680, 425);
             this.Controls.Add(this.panLogger);
             this.Controls.Add(this.splitter1);
             this.Controls.Add(this.panMain);
@@ -298,6 +350,8 @@
             this.panMain.ResumeLayout(false);
             this.panMain.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudTakeFirstNRows)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudDataStartRow)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudPaymentDescrCol)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -326,6 +380,10 @@
         private System.Windows.Forms.NumericUpDown nudTakeFirstNRows;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label labVersion;
+        private System.Windows.Forms.NumericUpDown nudDataStartRow;
+        private System.Windows.Forms.Label labDataStart;
+        private System.Windows.Forms.NumericUpDown nudPaymentDescrCol;
+        private System.Windows.Forms.Label labAgentNameCol;
     }
 }
 

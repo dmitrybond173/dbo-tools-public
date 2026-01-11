@@ -30,6 +30,9 @@ namespace OsbbRev2
             this.Items = new List<DataItem>();
             this.DefaultCategory = null;
             this.Flags = EFlags.None;
+
+            this.DataStartRow = 0;
+            this.PaymentDescrCol = 7;
             this.MaxRows = 0;
 
             loadConfiguration();
@@ -50,6 +53,8 @@ namespace OsbbRev2
         public CategoryDescriptor DefaultCategory { get; protected set; }
         public List<DataItem> Items { get; protected set; }
         public EFlags Flags { get; set; }
+        public int DataStartRow { get; set; }
+        public int PaymentDescrCol { get; set; }
         public int MaxRows { get; set; }
         public FilterDescriptor Filter { get; protected set; }
 

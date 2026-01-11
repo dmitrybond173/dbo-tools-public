@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<asmv1:assembly xsi:schemaLocation="urn:schemas-microsoft-com:asm.v1 assembly.adaptive.xsd" manifestVersion="1.0" xmlns:asmv1="urn:schemas-microsoft-com:asm.v1" xmlns="urn:schemas-microsoft-com:asm.v2" xmlns:asmv2="urn:schemas-microsoft-com:asm.v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:co.v1="urn:schemas-microsoft-com:clickonce.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:co.v2="urn:schemas-microsoft-com:clickonce.v2">
+  <asmv1:assemblyIdentity name="OsbbRev2.exe" version="1.0.0.0" publicKeyToken="e3efe3bdd2c2699b" language="neutral" processorArchitecture="msil" type="win32" />
+  <application />
+  <entryPoint>
+    <assemblyIdentity name="OsbbRev2" version="1.0.0.1" language="neutral" processorArchitecture="msil" />
+    <commandLine file="OsbbRev2.exe" parameters="" />
+  </entryPoint>
+  <trustInfo>
+    <security>
+      <applicationRequestMinimum>
+        <PermissionSet Unrestricted="true" ID="Custom" SameSite="site" />
+        <defaultAssemblyRequest permissionSetReference="Custom" />
+      </applicationRequestMinimum>
+      <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
+        <!--
+          UAC Manifest Options
+          If you want to change the Windows User Account Control level replace the
+          requestedExecutionLevel node with one of the following.
+
+        <requestedExecutionLevel  level="asInvoker" uiAccess="false" />
+        <requestedExecutionLevel  level="requireAdministrator" uiAccess="false" />
+        <requestedExecutionLevel  level="highestAvailable" uiAccess="false" />
+
+         If you want to utilize File and Registry Virtualization for backward
+         compatibility then delete the requestedExecutionLevel node.
+    -->
+        <requestedExecutionLevel level="asInvoker" uiAccess="false" />
+      </requestedPrivileges>
+    </security>
+  </trustInfo>
+  <dependency>
+    <dependentOS>
+      <osVersionInfo>
+        <os majorVersion="5" minorVersion="1" buildNumber="2600" servicePackMajor="0" />
+      </osVersionInfo>
+    </dependentOS>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="preRequisite" allowDelayedBinding="true">
+      <assemblyIdentity name="Microsoft.Windows.CommonLanguageRuntime" version="4.0.30319.0" />
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="OsbbRev2.exe" size="58816">
+      <assemblyIdentity name="OsbbRev2" version="1.0.0.1" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>Mn79i8e2QN31jdq5VPyS81Ac97plysXU7/s4giDNt4s=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="XService.Net2.dll" size="189440">
+      <assemblyIdentity name="XService.Net2" version="1.0.12.234" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>2IzF06vzN27CXrZEjJYwEwkXSYdUEtpWBbNVlxUszlM=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="XService.UI.dll" size="82432">
+      <assemblyIdentity name="XService.UI" version="1.0.1.42" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>3p2tkB7dbuoJ1aUjPiXZFXWYzJ6cHy4v3AKc5Sn5b2U=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <file name="OsbbRev2.exe.config" size="9053">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>1dcPuLocEWd9R/bnD9F8oE+6poUeAVfFMMIk7/n/rio=</dsig:DigestValue>
+    </hash>
+  </file>
+<publisherIdentity name="CN=BTOTESTWS\Dmitr" issuerKeyHash="c878cd8ca5caacd15557135725da4d80a18202c2" /><Signature Id="StrongNameSignature" xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha256" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" /><DigestValue>vGVLZDgNKSbPnrFmq614Ufui0y4yYLRVlluDQH20OmI=</DigestValue></Reference></SignedInfo><SignatureValue>kvDFEaOx8ps3v9/1X7ojOMKD3+5q34J4yBlNu9v4Hm5ntaS8YKxOUYk8oDdy1JoFf2Sa/GPl9JEyPt22Mo++svbRpBULlsTscvp9jWhipigEPrs6EJ8gZHsNfPVCcgQJ8VZmGmbo/qnH+CH7jbfO4BBYch1ktgVB34DbpGvqZFw=</SignatureValue><KeyInfo Id="StrongNameKeyInfo"><KeyValue><RSAKeyValue><Modulus>qLMj8d8Hh8UXnvuneMU6xKLHSYEOgVhKlRsXqwbmvZLneRCNdzI7ejjgL6g5F6x4M6nP/rDL1bU9y8GD6K0DkDxCe6lWhh10yJMB+cT603JdePUJbOfzLDCFmVpFCsGK/4CF1waXg7QqxiK+MMkoDfogXTZNZDIwWOI7QYrdVC0=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue><msrel:RelData xmlns:msrel="http://schemas.microsoft.com/windows/rel/2005/reldata"><r:license xmlns:r="urn:mpeg:mpeg21:2003:01-REL-R-NS" xmlns:as="http://schemas.microsoft.com/windows/pki/2005/Authenticode"><r:grant><as:ManifestInformation Hash="623ab47d40835b9655b460322ed3a2fb5178adab66b19ecf26290d38644b65bc" Description="" Url=""><as:assemblyIdentity name="OsbbRev2.exe" version="1.0.0.0" publicKeyToken="e3efe3bdd2c2699b" language="neutral" processorArchitecture="msil" type="win32" /></as:ManifestInformation><as:SignedBy /><as:AuthenticodePublisher><as:X509SubjectName>CN=BTOTESTWS\Dmitr</as:X509SubjectName></as:AuthenticodePublisher></r:grant><r:issuer><Signature Id="AuthenticodeSignature" xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha256" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" /><DigestValue>UvI5ymcVa/B6Q/HuYHIWhuQO+SvbQKXS0OMqFQent70=</DigestValue></Reference></SignedInfo><SignatureValue>lfQj9idyjPD3ia8pZALZCzPAox88uIuMHbhnC87KwJroWJTyKjcAtrUe/Gmjfwg9pBtfGCsJ+5+ImwmvixBypOedONKTEQpohtSBnNuZHeL91N8sryBZvwAoE9fuyx3X4xoMbRpI0i11di08V0/arvpvlpxBoPOfUq19rz+5QUk=</SignatureValue><KeyInfo><KeyValue><RSAKeyValue><Modulus>qLMj8d8Hh8UXnvuneMU6xKLHSYEOgVhKlRsXqwbmvZLneRCNdzI7ejjgL6g5F6x4M6nP/rDL1bU9y8GD6K0DkDxCe6lWhh10yJMB+cT603JdePUJbOfzLDCFmVpFCsGK/4CF1waXg7QqxiK+MMkoDfogXTZNZDIwWOI7QYrdVC0=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue><X509Data><X509Certificate>MIIB1TCCAT6gAwIBAgIQMWt/0swDt5RCbGFIvAseHTANBgkqhkiG9w0BAQsFADApMScwJQYDVQQDHh4AQgBUAE8AVABFAFMAVABXAFMAXABEAG0AaQB0AHIwHhcNMjYwMTExMTI0NTE5WhcNMjcwMTExMTg0NTE5WjApMScwJQYDVQQDHh4AQgBUAE8AVABFAFMAVABXAFMAXABEAG0AaQB0AHIwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAKizI/HfB4fFF577p3jFOsSix0mBDoFYSpUbF6sG5r2S53kQjXcyO3o44C+oOReseDOpz/6wy9W1PcvBg+itA5A8QnupVoYddMiTAfnE+tNyXXj1CWzn8ywwhZlaRQrBiv+AhdcGl4O0KsYivjDJKA36IF02TWQyMFjiO0GK3VQtAgMBAAEwDQYJKoZIhvcNAQELBQADgYEARaq/oSNqvSBf8X6yNlrr3mQ0uoNRsfW07cclWEvCrmize8hMYgE0UEoVFNbVkcNCiLrsmDtqSWISjfpFOO+YUTltGtu0mh2ZE6kE3EOLSfsYQwcXmbe2O9/CFuYa6D3Sbo8yeLm79n65jxdIi2Nbw//+apeXth6szGP5vHlHBkI=</X509Certificate></X509Data></KeyInfo></Signature></r:issuer></r:license></msrel:RelData></KeyInfo></Signature></asmv1:assembly>

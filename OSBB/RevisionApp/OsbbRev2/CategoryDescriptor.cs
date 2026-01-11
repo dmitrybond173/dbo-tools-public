@@ -133,12 +133,27 @@ namespace OsbbRev2
                     if (StrUtils.IsSameText(node.Name, "regexp") || StrUtils.IsSameText(node.Name, "rexp"))
                         result.RegexExpression = node.Value;
                 }
+
+                foreach (XmlNode node in pCfgNode.ChildNodes)
+                { 
+                    if (node.NodeType != XmlNodeType.Element) continue;
+
+                    Pattern subItem = Pattern.Load((XmlElement)node);
+                    if (subItem != null)
+                    {
+                        if (result.SubPatterns == null)
+                            result.SubPatterns = new List<Pattern>();
+                        result.SubPatterns.Add(subItem);
+                    }
+                }
+
                 return result;
             }
 
             internal Pattern() 
             {
                 this.IsExclusion = false;
+                this.SubPatterns = null;
             }
 
             public override string ToString()
@@ -169,6 +184,7 @@ namespace OsbbRev2
             public string Contains { get; protected set; }
             public string EndsWith { get; protected set; }
             public string RegexExpression { get; protected set; }
+            public List<Pattern> SubPatterns { get; protected set; }
 
             public Regex Regex 
             {
@@ -190,24 +206,52 @@ namespace OsbbRev2
                 if (this.Field == EField.CounterParty)
                     text = pItem.CounterParty;
 
-                bool result = false;
+                bool isOk;
+                bool? result = null;
                 if (this.StartsWith != null)
                 {
-                    result = text.ToUpper().StartsWith(this.StartsWith.ToUpper());
+                    isOk = text.ToUpper().StartsWith(this.StartsWith.ToUpper());
+                    if (!result.HasValue) result = isOk; 
+                    else result &= isOk;
                 }
                 if (this.Contains != null)
                 {
-                    result = text.ToUpper().Contains(this.Contains.ToUpper());
+                    isOk = text.ToUpper().Contains(this.Contains.ToUpper());
+                    if (!result.HasValue) result = isOk;
+                    else result &= isOk;
                 }
                 if (this.EndsWith != null)
                 {
-                    result = text.ToUpper().EndsWith(this.EndsWith.ToUpper());
+                    isOk = text.ToUpper().EndsWith(this.EndsWith.ToUpper());
+                    if (!result.HasValue) result = isOk;
+                    else result &= isOk;
                 }
                 if (this.RegexExpression != null)
                 {
-                    result = this.Regex.IsMatch(text);
+                    isOk = this.Regex.IsMatch(text);
+                    if (!result.HasValue) result = isOk;
+                    else result &= isOk;
                 }
-                return result;
+
+                if (this.SubPatterns != null)
+                {
+                    bool? res = null;
+                    foreach (Pattern p in this.SubPatterns)
+                    {
+                        isOk = p.IsMatch(pItem);
+                        if (!res.HasValue) 
+                            result = isOk;
+                        else 
+                            res &= isOk;
+                        if (!res.Value) break;
+                    }
+                    if (!result.HasValue) 
+                        result = res.Value;
+                    else 
+                        result &= res.Value;
+                }
+
+                return result.HasValue ? result.Value : false;
             }
 
             #region Implementation details

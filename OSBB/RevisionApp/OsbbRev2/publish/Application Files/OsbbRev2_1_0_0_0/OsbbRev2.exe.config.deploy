@@ -86,14 +86,13 @@
             <Pattern contains="{charity}" />
         </Category>
 
-        <Category caption="За вивiз ТПВ">
+        <Category caption="За вивiз ТПВ  за листопад">
             <Pattern contains="вивiз ТПВ" />
             <Pattern contains="послугу з вивезення побутових вiдходiв" />
             <Pattern contains="вивiз побутового смiття" />
             <Pattern contains="вивезення будiвельних вiдходiв" />
             <Pattern contains="вивiз твердих побутових вiдходiв" />
             <Pattern contains="твердих побутових вiдходiв" />
-            <Pattern rexp=".*смiття.*|.*вiдходiв.*" />
             <Pattern contains="ЕКОСЕРВIС ГРУП-ТБО ТОВ" field="CounterParty" />
         </Category>
 
@@ -142,17 +141,6 @@
         <Category caption="Гранты">
             <Pattern contains="ФОНД ЕНЕРГОЕФЕКТИВНОСТ" field="CounterParty" />
             <Pattern contains="Фонд енергоефективност" field="CounterParty" />            
-        </Category>
-
-        <Category caption="Услуги">
-            <Pattern>
-                <Pattern contains="послуги.*згiдно\s+договору" />
-                <Pattern contains="ФОП" field="CounterParty" />
-            </Pattern>
-            <Pattern>
-                <Pattern rexp=".*згiдно.*рахунку.*" />
-                <Pattern contains="ФОП" field="CounterParty" />
-            </Pattern>
         </Category>
 
         <Category caption="Комiсiя">
