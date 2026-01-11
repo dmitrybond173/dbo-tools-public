@@ -219,7 +219,8 @@ namespace OsbbRev2
                 //1133, 1237, 
                 //1354, 1452,
                 //1608, 1712, 1832
-                1550, 1660
+                //1550, 1660
+                939, 1030
             });
 
             public bool IsMatch(DataItem pItem)
