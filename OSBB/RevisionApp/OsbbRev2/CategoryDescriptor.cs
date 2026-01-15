@@ -40,6 +40,7 @@ namespace OsbbRev2
         public XmlElement CfgNode { get; protected set; }
 
         public string Caption { get; protected set; }
+        public string Tag { get; protected set; }
         public int AccountNo { get; protected set; }
 
         public List<Pattern> Patterns { get; protected set; }
@@ -59,7 +60,10 @@ namespace OsbbRev2
 
                     // check exclusion pattern
                     if (p.IsMatch(pItem))
-                        return false;
+                    {
+                        if (p.IsMatch(pItem))
+                            return false;
+                    }                        
                 }
             }
 
@@ -85,13 +89,17 @@ namespace OsbbRev2
             attr = AppUtils.OptionalAttr("accountNo", this.CfgNode);
             if (attr != null && StrUtils.GetAsInt(attr.Value, out n))
                 this.AccountNo = n;
-            
+
+            attr = AppUtils.OptionalAttr("tag", this.CfgNode);
+            if (attr != null)
+                this.Tag = attr.Value;
+
             foreach (XmlNode node in this.CfgNode.ChildNodes) 
             {
                 if (node.NodeType != XmlNodeType.Element) continue;
                 if (StrUtils.IsSameText(node.Name, "Pattern") || StrUtils.IsSameText(node.Name, "NotPattern"))
                 {
-                    Pattern p = Pattern.Load((XmlElement)node);
+                    Pattern p = Pattern.Load(this, (XmlElement)node);
                     if (p != null)
                     {
                         this.Patterns.Add(p);
@@ -109,9 +117,9 @@ namespace OsbbRev2
         {
             public static StringComparison MATCH_OPTION = StringComparison.InvariantCultureIgnoreCase;
 
-            public static Pattern Load(XmlElement pCfgNode) 
+            public static Pattern Load(CategoryDescriptor pOwner, XmlElement pCfgNode) 
             {
-                Pattern result = new Pattern();
+                Pattern result = new Pattern(pOwner);
 
                 result.IsExclusion = StrUtils.IsSameText(pCfgNode.Name, "NotPattern");
 
@@ -126,6 +134,9 @@ namespace OsbbRev2
                 {
                     if (StrUtils.IsSameText(node.Name, "exclude"))
                         result.IsExclusion = StrUtils.GetAsBool(node.Value);
+                    if (StrUtils.IsSameText(node.Name, "logic"))
+                        result.PatternLogic = StrUtils.IsSameText(node.Value, "OR") ? EPatternLogic.OR : EPatternLogic.AND;
+
                     if (StrUtils.IsSameText(node.Name, "exact") || StrUtils.IsSameText(node.Name, "match"))
                         result.ExactMatch = node.Value;
                     if (StrUtils.IsSameText(node.Name, "startsWith"))
@@ -136,15 +147,13 @@ namespace OsbbRev2
                         result.EndsWith = node.Value;
                     if (StrUtils.IsSameText(node.Name, "regexp") || StrUtils.IsSameText(node.Name, "rexp"))
                         result.RegexExpression = node.Value;
-                    if (StrUtils.IsSameText(node.Name, "logic"))
-                        result.PatternLogic = StrUtils.IsSameText(node.Value, "OR") ? EPatternLogic.OR : EPatternLogic.AND;
                 }
 
                 foreach (XmlNode node in pCfgNode.ChildNodes)
                 { 
                     if (node.NodeType != XmlNodeType.Element) continue;
 
-                    Pattern subItem = Pattern.Load((XmlElement)node);
+                    Pattern subItem = Pattern.Load(pOwner, (XmlElement)node);
                     if (subItem != null)
                     {
                         if (result.SubPatterns == null)
@@ -156,8 +165,9 @@ namespace OsbbRev2
                 return result;
             }
 
-            internal Pattern() 
+            internal Pattern(CategoryDescriptor pOwner) 
             {
+                this.Owner = pOwner;
                 this.IsExclusion = false;
                 this.SubPatterns = null;
                 this.PatternLogic = EPatternLogic.AND;
@@ -198,6 +208,8 @@ namespace OsbbRev2
                 OR
             }
 
+            public CategoryDescriptor Owner { get; protected set; }
+
             public bool IsExclusion { get; set; }
             public EPatternLogic PatternLogic { get; set; }
             public string ExactMatch { get; protected set; }
@@ -211,7 +223,7 @@ namespace OsbbRev2
             {
                 get
                 { 
-                    if (this.regex == null)
+                    if (this.regex == null && !string.IsNullOrEmpty(this.RegexExpression))
                         this.regex = new Regex(this.RegexExpression, 
                             RegexOptions.IgnoreCase 
                             | RegexOptions.CultureInvariant
@@ -227,7 +239,8 @@ namespace OsbbRev2
                 //1354, 1452,
                 //1608, 1712, 1832
                 //1550, 1660
-                939, 1030, 1133
+                //939, 1030, 1133
+                29
             });
 
             public bool IsMatch(DataItem pItem)
@@ -239,7 +252,15 @@ namespace OsbbRev2
             protected bool perform_isMatch(DataItem pItem, int pLevel)
             {
                 // DBG:
-                if (dbg_catch.Contains(pItem.RowIndex) && this.SubPatterns != null)
+                if (dbg_catch.Contains(pItem.RowIndex))
+                {
+                    DataItem.dbg_Tag++;
+                }
+                if (StrUtils.IsSameText(this.Owner.Caption, "Платежи"))
+                {
+                    DataItem.dbg_Tag++;
+                }
+                if (this.SubPatterns != null)
                 {
                     DataItem.dbg_Tag++;
                 }
@@ -273,7 +294,6 @@ namespace OsbbRev2
                 }
                 if (isOk.HasValue)
                 {
-                    if (this.IsExclusion) isOk = !isOk;
                     if (!result.HasValue) 
                         result = isOk;
                     else 
@@ -311,7 +331,9 @@ namespace OsbbRev2
                         result &= res.Value;
                 }
 
-                return result.HasValue ? result.Value : false;
+                isOk = result.HasValue ? result.Value : false;
+                //if (this.IsExclusion) isOk = !isOk; // ?? <-- exclusions is handled at upper level
+                return isOk.Value;
             }
 
             #region Implementation details
