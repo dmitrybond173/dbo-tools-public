@@ -200,7 +200,7 @@ namespace OsbbRev2
                         break;
                 }
 
-                if (iRow > 1465)
+                if (iRow > 178)
                     sDbg = iRow.ToString();
 
                 bool isSkip = (StrUtils.IsSameText(vDescr, "xxx") || StrUtils.IsSameText(vDescr, "x"));

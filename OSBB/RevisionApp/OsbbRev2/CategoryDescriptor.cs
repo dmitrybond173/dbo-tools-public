@@ -107,6 +107,8 @@ namespace OsbbRev2
 
         public class Pattern
         {
+            public static StringComparison MATCH_OPTION = StringComparison.InvariantCultureIgnoreCase;
+
             public static Pattern Load(XmlElement pCfgNode) 
             {
                 Pattern result = new Pattern();
@@ -124,6 +126,8 @@ namespace OsbbRev2
                 {
                     if (StrUtils.IsSameText(node.Name, "exclude"))
                         result.IsExclusion = StrUtils.GetAsBool(node.Value);
+                    if (StrUtils.IsSameText(node.Name, "exact") || StrUtils.IsSameText(node.Name, "match"))
+                        result.ExactMatch = node.Value;
                     if (StrUtils.IsSameText(node.Name, "startsWith"))
                         result.StartsWith = node.Value;
                     if (StrUtils.IsSameText(node.Name, "contains"))
@@ -162,6 +166,8 @@ namespace OsbbRev2
             public override string ToString()
             {
                 string s = string.Format("{0}Pattern[field={1}; ", (this.IsExclusion ? "Not-" : ""), this.Field);
+                if (this.ExactMatch != null)
+                    s += string.Format("match={0}; ", this.ExactMatch);
                 if (this.StartsWith != null)
                     s += string.Format("starts={0}; ", this.StartsWith);
                 if (this.Contains != null)
@@ -194,6 +200,7 @@ namespace OsbbRev2
 
             public bool IsExclusion { get; set; }
             public EPatternLogic PatternLogic { get; set; }
+            public string ExactMatch { get; protected set; }
             public string StartsWith { get; protected set; }
             public string Contains { get; protected set; }
             public string EndsWith { get; protected set; }
@@ -241,31 +248,36 @@ namespace OsbbRev2
                 if (this.Field == EField.CounterParty)
                     text = pItem.CounterParty;
 
-                bool isOk;
+                bool? isOk = null;
                 bool? result = null;
+                if (this.ExactMatch != null)
+                {
+                    isOk = (string.Compare(text, this.ExactMatch, MATCH_OPTION) == 0);
+                }
                 if (this.StartsWith != null)
                 {
-                    isOk = text.ToUpper().StartsWith(this.StartsWith.ToUpper());
-                    if (!result.HasValue) result = isOk; 
-                    else result &= isOk;
+                    isOk = text.StartsWith(this.StartsWith.ToUpper(), MATCH_OPTION);
                 }
                 if (this.Contains != null)
                 {
+                    // seems Contains does not have StringComparison parameter, so we do it manually
                     isOk = text.ToUpper().Contains(this.Contains.ToUpper());
-                    if (!result.HasValue) result = isOk;
-                    else result &= isOk;
                 }
                 if (this.EndsWith != null)
                 {
-                    isOk = text.ToUpper().EndsWith(this.EndsWith.ToUpper());
-                    if (!result.HasValue) result = isOk;
-                    else result &= isOk;
+                    isOk = text.EndsWith(this.EndsWith, MATCH_OPTION);
                 }
                 if (this.RegexExpression != null)
                 {
                     isOk = this.Regex.IsMatch(text);
-                    if (!result.HasValue) result = isOk;
-                    else result &= isOk;
+                }
+                if (isOk.HasValue)
+                {
+                    if (this.IsExclusion) isOk = !isOk;
+                    if (!result.HasValue) 
+                        result = isOk;
+                    else 
+                        result &= isOk;
                 }
 
                 if (this.SubPatterns != null)
@@ -273,6 +285,7 @@ namespace OsbbRev2
                     bool? res = null;
                     foreach (Pattern p in this.SubPatterns)
                     {
+                        isOk = p.perform_isMatch(pItem, pLevel + 1);
                         isOk = p.perform_isMatch(pItem, pLevel + 1);
 
                         if (this.PatternLogic == EPatternLogic.AND)
