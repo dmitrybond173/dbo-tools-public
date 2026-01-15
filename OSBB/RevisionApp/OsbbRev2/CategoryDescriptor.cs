@@ -134,18 +134,20 @@ namespace OsbbRev2
                 {
                     if (StrUtils.IsSameText(node.Name, "exclude"))
                         result.IsExclusion = StrUtils.GetAsBool(node.Value);
-                    if (StrUtils.IsSameText(node.Name, "logic"))
+                    else if (StrUtils.IsSameText(node.Name, "logic"))
                         result.PatternLogic = StrUtils.IsSameText(node.Value, "OR") ? EPatternLogic.OR : EPatternLogic.AND;
 
-                    if (StrUtils.IsSameText(node.Name, "exact") || StrUtils.IsSameText(node.Name, "match"))
+                    else if (StrUtils.IsSameText(node.Name, "comment") || StrUtils.IsSameText(node.Name, "descr"))
+                        result.Comment = node.Value;
+                    else if (StrUtils.IsSameText(node.Name, "exact") || StrUtils.IsSameText(node.Name, "match"))
                         result.ExactMatch = node.Value;
-                    if (StrUtils.IsSameText(node.Name, "startsWith"))
+                    else if (StrUtils.IsSameText(node.Name, "startsWith"))
                         result.StartsWith = node.Value;
-                    if (StrUtils.IsSameText(node.Name, "contains"))
+                    else if (StrUtils.IsSameText(node.Name, "contains"))
                         result.Contains = node.Value;
-                    if (StrUtils.IsSameText(node.Name, "endsWith"))
+                    else if (StrUtils.IsSameText(node.Name, "endsWith"))
                         result.EndsWith = node.Value;
-                    if (StrUtils.IsSameText(node.Name, "regexp") || StrUtils.IsSameText(node.Name, "rexp"))
+                    else if (StrUtils.IsSameText(node.Name, "regexp") || StrUtils.IsSameText(node.Name, "rexp"))
                         result.RegexExpression = node.Value;
                 }
 
@@ -170,12 +172,17 @@ namespace OsbbRev2
                 this.Owner = pOwner;
                 this.IsExclusion = false;
                 this.SubPatterns = null;
-                this.PatternLogic = EPatternLogic.AND;
+                this.PatternLogic = EPatternLogic.OR;
             }
 
             public override string ToString()
             {
-                string s = string.Format("{0}Pattern[field={1}; ", (this.IsExclusion ? "Not-" : ""), this.Field);
+                string s = string.Format("{0}Pattern[field={1}; {2} ", 
+                    (this.IsExclusion ? "Not-" : ""), 
+                    this.Field, 
+                    (this.Comment != null ? this.Comment : "")
+                    );
+
                 if (this.ExactMatch != null)
                     s += string.Format("match={0}; ", this.ExactMatch);
                 if (this.StartsWith != null)
@@ -186,6 +193,7 @@ namespace OsbbRev2
                     s += string.Format("ends={0}; ", this.EndsWith);
                 if (this.RegexExpression != null)
                     s += string.Format("rexp={0}; ", this.RegexExpression);
+
                 if (this.SubPatterns != null)
                 {
                     s += string.Format("{0} sub-patterns(by {1}); ", this.SubPatterns.Count, this.PatternLogic);
@@ -212,6 +220,7 @@ namespace OsbbRev2
 
             public bool IsExclusion { get; set; }
             public EPatternLogic PatternLogic { get; set; }
+            public string Comment { get; protected set; }
             public string ExactMatch { get; protected set; }
             public string StartsWith { get; protected set; }
             public string Contains { get; protected set; }
@@ -240,7 +249,9 @@ namespace OsbbRev2
                 //1608, 1712, 1832
                 //1550, 1660
                 //939, 1030, 1133
-                29
+                //29
+                //3241 // За вивiз ТПВ; Услуги
+                592
             });
 
             public bool IsMatch(DataItem pItem)
@@ -256,7 +267,11 @@ namespace OsbbRev2
                 {
                     DataItem.dbg_Tag++;
                 }
-                if (StrUtils.IsSameText(this.Owner.Caption, "Платежи"))
+                if (StrUtils.IsSameText(this.Owner.Caption, "Услуги"))
+                {
+                    DataItem.dbg_Tag++;
+                }
+                if (this.Comment != null && StrUtils.IsSameText(this.Comment, "dbg-1"))
                 {
                     DataItem.dbg_Tag++;
                 }

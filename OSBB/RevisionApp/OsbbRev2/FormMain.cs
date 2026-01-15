@@ -200,6 +200,7 @@ namespace OsbbRev2
                         break;
                 }
 
+                //DBG:
                 if (iRow > 178)
                     sDbg = iRow.ToString();
 
@@ -355,19 +356,23 @@ namespace OsbbRev2
 
         private void writeLogger(string pMessage, bool pWriteLine)
         {
+            ListView lv = lvLogger;
             string ts = StrUtils.NskTimestampOf(DateTime.Now).Substring(11, 12);
 
-            while (lvLogger.Items.Count > MAX_LOGGER_ITEMS)
+            if ((lv.Items.Count - 10) > MAX_LOGGER_ITEMS)
             {
-                lvLogger.Items.RemoveAt(0);
+                while (lv.Items.Count > MAX_LOGGER_ITEMS)
+                {
+                    lv.Items.RemoveAt(0);
+                }
             }
 
             ListViewItem li = null;
             if (!pWriteLine)
             {
-                if (lvLogger.Items.Count > 0)
+                if (lv.Items.Count > 0)
                 {
-                    li = lvLogger.Items[lvLogger.Items.Count - 1];
+                    li = lv.Items[lv.Items.Count - 1];
                     li.SubItems[0].Text = ts;
                     li.SubItems[1].Text += pMessage;
                 }
@@ -382,13 +387,13 @@ namespace OsbbRev2
                     foreach (string line in lines)
                     {
                         li = new ListViewItem(new string[] { ts, line });
-                        lvLogger.Items.Add(li);
+                        lv.Items.Add(li);
                     }
                 }
                 else
                 {
                     li = new ListViewItem(new string[] { ts, pMessage });
-                    lvLogger.Items.Add(li);
+                    lv.Items.Add(li);
                 }
             }
             if (li != null)
