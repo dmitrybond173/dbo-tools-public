@@ -227,4 +227,176 @@ Sub AssignPrefixByRefs()
 End Sub
 
 
+Function IsValidTxRef(ByVal pRef As String, ByRef pRowIndex As Integer) As Boolean
+    
+    pRowIndex = -1
+    
+    Dim result As Boolean
+    result = (Len(pRef) = 5) And (Left(pRef, 1) = "#")
+    
+    If result Then
+    
+        Dim id As String
+        id = pRef
+        id = Replace(id, "#", "")
+        While (Len(id) > 0) And (Left(id, 1) = "0")
+          id = Mid(id, 2, Len(id) - 1)
+        Wend
+        pRowIndex = CInt(id)
+        
+    End If
+    
+    IsValidTxRef = result
+
+End Function
+
+
+Sub BuildRefs(ByRef refs As Scripting.Dictionary)
+    
+    Dim wsStat As Worksheet
+    Set wsStat = ThisWorkbook.Sheets("Ñòàòèñòèêà")
+
+    Dim toSkip As New Scripting.Dictionary
+    toSkip.Add "row#", 1
+    toSkip.Add "", 1
+
+    Dim z, txAmnt
+    Dim s, txId As String
+    Dim iRow, iCol, emptyCnt As Integer
+    Dim txRowIdx As Integer
+    
+    Dim txRef As ClsTxRef
+
+    iCol = 7
+    iRow = 8
+    emptyCnt = 0
+    
+    list = ""
+    
+    Do While emptyCnt < 100
+        
+        s = wsStat.Cells(iRow, iCol).Value
+        
+        txRowIdx = -1
+        isValidRef = (Not toSkip.Exists(s)) And IsValidTxRef(s, txRowIdx)
+        
+        If isValidRef Then
+        
+            txId = CStr(s)
+            txAmnt = wsStat.Cells(iRow, 11).Value
+            
+            'DBG:
+            If "#0805" = txId Or 805 = txRowIdx Then ' Or 5302 = iRow Then
+                s = "DBG!"
+            End If
+        
+            If Not refs.Exists(txId) Then
+                Set txRef = New ClsTxRef
+                refs.Add txId, txRef
+                txRef.TxRowId = txId
+                txRef.TxRowIndex = txRowIdx
+                txRef.TxAmount = txAmnt
+            Else
+                Set txRef = refs.Item(txId)
+            End If
+            txRef.RowNumbers.Add iRow
+        
+        Else
+        
+            emptyCnt = emptyCnt + 1
+            
+        End If
+        
+        iRow = iRow + 1
+        
+        'If iRow > 100 Then
+        '    Exit Do
+        'End If
+        
+    Loop
+    
+    'z = refs.Exists("#0805")
+    's = "DBG"
+
+End Sub
+
+
+Sub BackResolvingActRefs()
+
+    ' Idea: 1st need to build refs - txRow# with amount of money and with collection of rows on "Ñòàòèñòèêà" sheet
+    ' Then loop through the rows "Àêòû" sheet and check if against the refs we built, then insert into column "Àêòû" ref to act
+
+    Dim toSkip As New Scripting.Dictionary
+    toSkip.Add "#0", 1
+    toSkip.Add "", 1
+
+    Dim wsStat As Worksheet
+    Set wsStat = ThisWorkbook.Sheets("Ñòàòèñòèêà")
+    
+    Dim wsActs As Worksheet
+    Set wsActs = ThisWorkbook.Sheets("Àêòû")
+
+    Dim refs As New Scripting.Dictionary
+    BuildRefs refs
+    'MsgBox "cnt = " & CStr(refs.Count)
+    
+    Dim s
+    Dim txRef As ClsTxRef
+    Dim txId, txFile, xtxAmnt As String
+    Dim iRow, iCol, emptyCnt As Integer
+    Dim idx As Integer
+    Dim statRowIdx
+    iCol = 1
+    iRow = 2
+    
+    Do While emptyCnt < 100
+        
+        s = wsActs.Cells(iRow, iCol).Value
+        
+        isValidRef = (Not toSkip.Exists(s)) And IsValidTxRef(s, idx) And refs.Exists(s)
+        
+        If isValidRef Then
+        
+            txId = CStr(s)
+            txFile = wsActs.Cells(iRow, 3).Value
+            txAmnt = wsActs.Cells(iRow, 4).Value
+       
+            Set txRef = refs.Item(txId)
+            
+            isOk = (Int(Abs(txRef.TxAmount)) = Int(Abs(txAmnt)))
+            If isOk Then
+            
+                For Each statRowIdx In txRef.RowNumbers
+                    wsStat.Cells(statRowIdx, 12).Value = txFile
+                Next statRowIdx
+                
+            Else
+                msg = "ERR:Money is not match: " & CStr(txRef.TxAmount) & " vs. " & CStr(txAmnt)
+                
+                For Each statRowIdx In txRef.RowNumbers
+                    wsStat.Cells(statRowIdx, 12).Value = msg
+                Next statRowIdx
+                
+                'Err.Raise 1111, msg ', [Description], [HelpFile], [HelpContext]
+                'Exit Do
+            End If
+        
+        Else
+        
+            emptyCnt = emptyCnt + 1
+            
+        End If
+        
+        iRow = iRow + 1
+        
+        'If iRow > 100 Then
+        '    Exit Do
+        'End If
+        
+    Loop
+    
+    MsgBox "End row# " & CStr(iRow)
+
+End Sub
+
 
