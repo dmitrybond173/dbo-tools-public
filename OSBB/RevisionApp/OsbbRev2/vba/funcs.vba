@@ -81,6 +81,9 @@ End Sub
 
 Sub FixDateSelected()
     
+    ' Fix date text in selected cells
+    ' Idea: bank returns dates as "MM.DD.YYYY" text, this code change that to "YYYY/MM/DD"
+    
     Set rng = Application.Selection
 
     Dim s
@@ -103,6 +106,9 @@ End Sub
 
 
 Sub FixTimeSelected()
+    
+    ' Fix date text in selected cells
+    ' Idea: bank returns dates as "HH.mm.SS" text, this code change that to "HH:mm:SS"
     
     Set rng = Application.Selection
 
@@ -127,6 +133,13 @@ End Sub
 
 
 Sub AssignPrefixByRefs()
+
+    ' User should enter a text prefix to be added to all transactions referenced from selection
+    ' Idea: on a "Ñòàòèñòèêà"(Statistic) sheet user can select any rows with refs to transactions
+    ' then he press Alt+F8, select "AssignPrefixByRefs" macro to run, enter a text, press [OK]
+    ' and this VBA script will add specified prefix to all referenced trasactions on "ÑÂÎÄÍÀß" sheet
+    ' So, each transaction on a "Ñòàòèñòèêà"(Statistic) sheet in column "G" has a #NNNN number
+    ' Such number is a row number on "ÑÂÎÄÍÀß" sheet
 
     Dim prefix
     prefix = InputBox("Please specify prefix", "Prefix to Assign", "")
